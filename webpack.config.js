@@ -1,6 +1,8 @@
 const path = require("path");
 const HTMLWebpackPlugin = require("html-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
+
 const webpack = require("webpack");
 
 module.exports = {
@@ -16,18 +18,25 @@ module.exports = {
         rules: [
             {
                 test: /\.tsx?$/,
-                use: ["ts-loader"]
+                use: [
+                    "string-replace-loader?search=React\\.createElement&replace=createElement&flags=g",
+                    "awesome-typescript-loader"
+                ]
+            },
+            {
+                test: /\.css$/,
+                use: ExtractTextPlugin.extract({
+                    fallback: "style-loader",
+                    use:
+                        "typings-for-css-modules-loader?modules&namedExport&camelCase&sourceMap=true&localIdentName=[name]__[local]"
+                })
             }
         ]
     },
     resolve: {
-        extensions: [".js", ".ts", ".tsx"],
-        alias: {
-            react: "preact-compat",
-            "react-dom": "preact-compat"
-        }
+        extensions: [".js", ".ts", ".tsx"]
     },
-    devtool: "eval",
+    devtool: "source-map",
     plugins: [
         new HTMLWebpackPlugin({
             title: "Podmod",
@@ -36,13 +45,14 @@ module.exports = {
             template: "src/index.ejs"
         }),
         new webpack.ProvidePlugin({
-            React: "preact-compat"
+            createElement: ["preact", "h"]
         }),
         new CopyWebpackPlugin([
             {
                 from: "bundles",
                 to: "bundles"
             }
-        ])
+        ]),
+        new ExtractTextPlugin("styles.css")
     ]
 };

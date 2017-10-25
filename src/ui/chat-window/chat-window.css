@@ -1,0 +1,60 @@
+.chat {
+    background: #d1d7dc;
+    flex-grow: 1;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.chat-container {
+    flex-grow: 1;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+}
+
+.bubble {
+    background: #fff;
+    padding: 3vw;
+    margin: 0 3vw 3vw;
+    margin-left: 6vw;
+    border-radius: 2vw;
+    color: #555555;
+    flex-shrink: 0;
+}
+
+.spacer {
+    flex-grow: 1;
+}
+
+.more-button {
+    position: absolute;
+    bottom: 0vw;
+    text-align: center;
+    width: 100%;
+    z-index: 1;
+    animation-name: more-button-slide-in;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+    border-width: 0;
+}
+
+@keyframes more-button-slide-in {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(-10vw);
+    }
+}
+
+.more-button button {
+    background: #5ebfba;
+    color: #fff;
+    font-size: 14px;
+    padding: 3vw 4vw;
+    line-height: 14px;
+    border-radius: 3vw;
+}

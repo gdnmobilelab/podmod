@@ -1,10 +1,13 @@
 {
     "compilerOptions": {
-        "module": "es2015",
+        "module": "es6",
         "target": "es5",
         "jsx": "react",
         "lib": ["es6", "dom", "webworker"],
-        "moduleResolution": "node"
+        "moduleResolution": "node",
+        "allowJs": true,
+        "outDir": "lib",
+        "strictNullChecks": true
     },
     "include": ["src"]
 }

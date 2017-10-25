@@ -1,17 +1,14 @@
-import { CommandListener } from "service-worker-command-bridge";
 import { ShowNotification } from "./interfaces/notification";
-import { Comlink } from "comlinkjs";
 import { WorkerBridge } from "./bridge/worker-bridge";
-import {
-    NotificationBridge,
-    NotificationBridgeInstance
-} from "./bridge/notification";
+import { NotificationBridge, NotificationBridgeInstance } from "./bridge/notification";
 import { CacheSync } from "./io/cache-sync";
+import { CommandListener } from "service-worker-command-bridge";
+
+import { CacheSyncRequest, CacheSyncResponse } from "./interfaces/cache-sync-request";
 
 declare var self: ServiceWorkerGlobalScope;
 
 self.addEventListener("fetch", (e: FetchEvent) => {
-    console.log("received fetch");
     e.respondWith(
         caches
             .match(e.request)
@@ -25,10 +22,27 @@ self.addEventListener("fetch", (e: FetchEvent) => {
     );
 });
 
-self.addEventListener("message", e => {
-    console.log("GOT MESSAGE");
-    Comlink.expose({ WorkerBridge }, e.ports[0]);
+CommandListener.bind("cachesync", (request: CacheSyncRequest) => {
+    let sync = new CacheSync(request.cacheName, request.payloadURL);
+    let channel = new MessageChannel();
+
+    sync.addEventListener("progress", e => {
+        channel.port1.postMessage(
+            Object.assign(e.detail, {
+                type: "progress"
+            })
+        );
+    });
+    return {
+        progressEvents: channel.port2
+    } as CacheSyncResponse;
 });
+
+CommandListener.listen();
+
+// self.addEventListener("message", e => {
+//     console.log("GOT MESSAGE");
+// });
 
 self.addEventListener("install", e => self.skipWaiting());
 self.addEventListener("activate", e => self.clients.claim());
@@ -40,8 +54,8 @@ self.addEventListener("activate", e => self.clients.claim());
 
 // CommandListener.listen();
 
-let sync = new CacheSync("test-cache", "./bundles/mona-ep-1/files.json");
-sync.addEventListener("progress", e => {
-    console.log(e.detail);
-});
-sync.complete.then(() => console.info("done"));
+// let sync = new CacheSync("test-cache", "./bundles/mona-ep-1/files.json");
+// sync.addEventListener("progress", e => {
+//     console.log(e.detail);
+// });
+// sync.complete.then(() => console.info("done"));

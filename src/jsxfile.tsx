@@ -5,9 +5,9 @@ function go() {
     console.log("wtf");
     Notification.requestPermission().then(() => {
         console.log("do it?");
-        return runServiceWorkerCommand<ShowNotification>("show-notification", {
-            title: "test!"
-        });
+        // return runServiceWorkerCommand<ShowNotification>("show-notification", {
+        //     title: "test!"
+        // });
     });
 }
 

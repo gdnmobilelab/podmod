@@ -1,0 +1,26 @@
+.waveform {
+    width: 100%;
+    height: 15vw;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.waveform-bar {
+    stroke: #5e646c;
+    /* transition: height 0.2s linear, y 0.2s linear; */
+    transition-property: height, y, fill;
+    transition-timing-function: linear;
+    transition-duration: 200ms;
+    fill: #6d7073;
+}
+.waveform-bar-loaded {
+    fill: #8c9094;
+}
+.waveform-bar-playback {
+    fill: #5ebfba;
+}
+
+.waveform-svg {
+    width: 100%;
+    height: 100%;
+}

@@ -1,0 +1,21 @@
+.controls {
+    text-align: center;
+    margin-top: 3vw;
+}
+
+.controls button {
+    border: solid 1px #4c5057;
+    background: transparent;
+    color: #fff;
+    padding: 1.5vw 4vw;
+    font-weight: bold;
+    display: inline-block;
+    margin: 0 1vw;
+    border-radius: 2vw;
+    font-size: 12px;
+    line-height: 12px;
+}
+
+.controls button:disabled {
+    opacity: 0.5;
+}
