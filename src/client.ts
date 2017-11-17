@@ -1,14 +1,22 @@
 import { createAudioTest } from "./ui/audio-test";
-import { render, h } from "preact";
+import { render } from "react-dom";
+import { createElement } from "react";
 import { Frame } from "./ui/frame/frame";
 
 import { DownloadProgress } from "./io/download-progress";
 import { CacheSync } from "./io/cache-sync";
 import { runServiceWorkerCommand } from "service-worker-command-bridge";
 import { CacheSyncResponse, CacheSyncRequest } from "./interfaces/cache-sync-request";
+
+import { main } from "./ui/frame/frame.css";
+
 declare var navigator: Navigator;
 
-render(h(Frame, {}), document.body);
+let container = document.createElement("div");
+container.className = main;
+document.body.appendChild(container);
+
+render(createElement(Frame, {}), container);
 
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("worker.js");

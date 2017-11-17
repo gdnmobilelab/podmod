@@ -31,11 +31,19 @@
         "webpack-dev-server": "^2.9.2"
     },
     "dependencies": {
+        "@types/react": "^16.0.22",
         "awesome-typescript-loader": "^3.2.3",
         "comlinkjs": "^2.3.0",
+        "deep-for-each": "^1.0.6",
         "event-target-shim": "^3.0.0",
+        "file-loader": "^1.1.5",
         "html-webpack-plugin": "^2.30.1",
+        "performance-scroll-view": "file:../performance-scroll-view",
+        "photoswipe": "^4.1.2",
         "range-parser": "^1.2.0",
-        "service-worker-command-bridge": "^1.0.1"
+        "react": "^16.1.1",
+        "react-dom": "^16.1.1",
+        "react-photoswipe": "^1.3.0",
+        "service-worker-command-bridge": "file:../sw-mini-libraries/service-worker-command-bridge"
     }
 }

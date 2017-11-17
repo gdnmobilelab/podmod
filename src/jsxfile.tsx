@@ -1,6 +1,6 @@
 import { runServiceWorkerCommand } from "service-worker-command-bridge";
 import { ShowNotification } from "./interfaces/notification";
-
+import * as React from "react";
 function go() {
     console.log("wtf");
     Notification.requestPermission().then(() => {

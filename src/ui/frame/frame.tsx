@@ -1,7 +1,7 @@
 import * as styles from "./frame.css";
 import { ChatWindow } from "../chat-window/chat-window";
-import { Component } from "preact";
-import { runServiceWorkerCommand } from "service-worker-command-bridge";
+import * as React from "react";
+import { runServiceWorkerCommand, ServiceWorkerNotSupportedError } from "service-worker-command-bridge";
 import { CacheSyncRequest, CacheSyncResponse } from "../../interfaces/cache-sync-request";
 import { Waveform } from "../waveform/waveform";
 import { Controls } from "../controls/controls";
@@ -24,11 +24,11 @@ interface PlayerState {
     playState: PlayState;
 }
 
-export class Frame extends Component<any, PlayerState> {
+export class Frame extends React.Component<any, PlayerState> {
     audioElement: HTMLAudioElement;
 
-    constructor() {
-        super();
+    constructor(props) {
+        super(props);
         this.state = {
             playState: PlayState.Paused
         };
@@ -48,9 +48,9 @@ export class Frame extends Component<any, PlayerState> {
         }
 
         return (
-            <div class={styles.frame}>
+            <div className={styles.frame}>
                 <audio
-                    src="/bundles/mona-ep-1/Data_Pod_E01_v3_192519.mp3"
+                    src="/bundles/mona-ep-1/Data_Pod_v4_mp3.mp3"
                     preload="auto"
                     onProgress={this.audioProgress}
                     onTimeUpdate={this.timeUpdate}
@@ -82,11 +82,12 @@ export class Frame extends Component<any, PlayerState> {
         );
     }
 
-    componentDidMount() {
-        runServiceWorkerCommand<CacheSyncRequest, CacheSyncResponse>("cachesync", {
-            cacheName: "mona-ep-1",
-            payloadURL: "/bundles/mona-ep-1/files.json"
-        }).then(response => {
+    async componentDidMount() {
+        try {
+            let response = await runServiceWorkerCommand<CacheSyncRequest, CacheSyncResponse>("cachesync", {
+                cacheName: "mona-ep-1",
+                payloadURL: "/bundles/mona-ep-1/files.json"
+            });
             response.progressEvents.onmessage = (e: MessageEvent) => {
                 this.setState({
                     download: {
@@ -95,12 +96,16 @@ export class Frame extends Component<any, PlayerState> {
                     }
                 });
             };
-        });
+        } catch (ex) {
+            if (ex instanceof ServiceWorkerNotSupportedError === false) {
+                throw ex;
+            }
+        }
     }
 
     nextSecondTimeout: number;
 
-    timeUpdate(e: Event) {
+    timeUpdate(e: React.SyntheticEvent<HTMLAudioElement>) {
         let currentTime = this.audioElement.currentTime;
         let nextSecond = Math.ceil(currentTime);
         let untilNextSecond = nextSecond - currentTime;

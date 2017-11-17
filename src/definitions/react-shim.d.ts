@@ -1,3 +1,3 @@
-// This exists just to stop VSCode complaining about a missing React variable
+// // This exists just to stop VSCode complaining about a missing React variable
 
-declare var React: object;
+// declare var React: object;

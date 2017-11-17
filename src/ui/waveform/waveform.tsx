@@ -1,4 +1,4 @@
-import { Component } from "preact";
+import * as React from "react";
 import * as styles from "./waveform.css";
 
 interface WaveformProps {
@@ -12,9 +12,14 @@ interface WaveformState {
     svgPath?: string;
 }
 
-export class Waveform extends Component<WaveformProps, WaveformState> {
+export class Waveform extends React.Component<WaveformProps, WaveformState> {
+    constructor(props) {
+        super(props);
+        this.state = {};
+    }
+
     renderWaveform() {
-        let lines = [];
+        let lines: JSX.Element[] = [];
 
         let percentEach = 1;
 

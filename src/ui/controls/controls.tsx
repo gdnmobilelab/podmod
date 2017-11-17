@@ -1,4 +1,5 @@
 import * as styles from "./controls.css";
+import * as React from "react";
 
 interface PlayerControlProperties {
     canPlay: boolean;

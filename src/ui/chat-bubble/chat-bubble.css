@@ -1,0 +1,58 @@
+.bubble-container {
+    text-align: right;
+}
+
+.bubble {
+    background: #f0f0f0;
+    display: inline-block;
+    border-radius: 15px;
+    margin: 10px;
+    overflow: hidden;
+}
+
+.bubble-touch {
+    background: #ccc;
+}
+
+.bubble-text {
+    padding: 10px 15px;
+}
+
+.bubble-link {
+    display: flex;
+    text-decoration: none;
+    color: #000;
+}
+
+.bubble-link-title {
+    font-size: 13px;
+    font-weight: bold;
+    display: block;
+    text-align: left;
+}
+
+.bubble-link-domain {
+    font-size: 13px;
+    color: #bdbdbd;
+    display: block;
+    text-align: left;
+}
+
+.bubble-link-image-container {
+    padding-left: 30px;
+}
+
+.bubble-link-image {
+    display: block;
+    float: right;
+    height: 30px;
+    width: 30px;
+}
+
+.bubble-full-width {
+    display: block;
+}
+
+.bubble-image-container {
+    /* margin-bottom: 10px; */
+}

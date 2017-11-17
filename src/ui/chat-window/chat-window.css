@@ -2,9 +2,8 @@
     background: #d1d7dc;
     flex-grow: 1;
     overflow: auto;
-    -webkit-overflow-scrolling: touch;
-    display: flex;
-    flex-direction: column;
+    /* display: flex; */
+    /* flex-direction: column; */
     position: relative;
 }
 
@@ -23,10 +22,15 @@
     border-radius: 2vw;
     color: #555555;
     flex-shrink: 0;
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+    position: absolute;
+    top: 0;
 }
 
 .spacer {
     flex-grow: 1;
+    height: 200vh;
 }
 
 .more-button {

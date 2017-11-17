@@ -18,23 +18,32 @@ module.exports = {
         rules: [
             {
                 test: /\.tsx?$/,
-                use: [
-                    "string-replace-loader?search=React\\.createElement&replace=createElement&flags=g",
-                    "awesome-typescript-loader"
-                ]
+                use: ["awesome-typescript-loader"]
             },
             {
-                test: /\.css$/,
+                test: /\.(gif|png|svg)?$/,
+                use: ["file-loader"]
+            },
+            {
+                test: /src\/(.*)\.css$/,
                 use: ExtractTextPlugin.extract({
                     fallback: "style-loader",
                     use:
                         "typings-for-css-modules-loader?modules&namedExport&camelCase&sourceMap=true&localIdentName=[name]__[local]"
                 })
+            },
+            {
+                test: /node_modules\/(.*)\.css$/,
+                use: ExtractTextPlugin.extract({
+                    fallback: "style-loader",
+                    use: "css-loader"
+                })
             }
         ]
     },
     resolve: {
-        extensions: [".js", ".ts", ".tsx"]
+        extensions: [".js", ".ts", ".tsx"],
+        modules: [path.join(__dirname, "node_modules")]
     },
     devtool: "source-map",
     plugins: [
@@ -43,9 +52,6 @@ module.exports = {
             filename: "index.html",
             excludeChunks: ["worker"],
             template: "src/index.ejs"
-        }),
-        new webpack.ProvidePlugin({
-            createElement: ["preact", "h"]
         }),
         new CopyWebpackPlugin([
             {

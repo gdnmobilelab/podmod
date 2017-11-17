@@ -31,12 +31,10 @@ export class DownloadProgress extends EventTarget {
         super();
         let lengthHeader = response.headers.get("Content-Length");
         if (!lengthHeader) {
-            throw new Error(
-                "Download progress requires a Content-Length header."
-            );
+            throw new Error("Download progress requires a Content-Length header.");
         }
         this.length = parseInt(lengthHeader, 10);
-        this.reader = response.clone().body.getReader();
+        this.reader = response.clone().body!.getReader();
         this.emitUpdate();
         this.performRead();
     }

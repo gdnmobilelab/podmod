@@ -11,6 +11,11 @@ body {
     font-family: sans-serif;
 }
 
+.main {
+    display: flex;
+    height: 100%;
+}
+
 .frame {
     flex-grow: 1;
     display: flex;
