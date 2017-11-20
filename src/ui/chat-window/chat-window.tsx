@@ -38,11 +38,15 @@ export class ChatWindow extends React.Component<ChatWindowProps, any> {
     mapResponseToScriptEntry(response: ChatBubbleProperties): ChatBubbleProperties {
         let mappedProperties: { [key: string]: any } = {};
         let baseURL = new URL(this.props.url, window.location.href);
-        if (response.image) {
-            mappedProperties.image = Object.assign({}, response.image, {
-                url: new URL(response.image.url, baseURL.href).href
-            });
+
+        if (response.images) {
+            mappedProperties.images = response.images.map(image =>
+                Object.assign({}, response.image, {
+                    url: new URL(image.url, baseURL.href).href
+                })
+            );
         }
+
         if (response.link) {
             let url = new URL(response.link.url, baseURL.href);
             let imageURL: string | undefined = undefined;

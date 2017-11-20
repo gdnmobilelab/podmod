@@ -1,8 +1,7 @@
 import * as styles from "./chat-bubble.css";
 import * as React from "react";
 import { Component } from "react";
-import "react-photoswipe/lib/photoswipe.css";
-import { PhotoSwipeGallery } from "react-photoswipe";
+import { getPhotoSwipeContainer, PhotoSwipe } from "../photoswipe/photoswipe";
 
 export enum BubbleType {
     text = "text"
@@ -10,7 +9,8 @@ export enum BubbleType {
 
 export interface ChatBubbleImage {
     url: string;
-    proportion: number;
+    width: number;
+    height: number;
 }
 
 export interface ChatBubbleLink {
@@ -25,20 +25,30 @@ export interface ChatBubbleProperties {
     text?: string;
     time: number;
     image?: ChatBubbleImage;
+    images?: ChatBubbleImage[];
     link?: ChatBubbleLink;
 }
 
 interface ChatBubbleState {
     touched: boolean;
+    expanded: boolean;
 }
 
-function renderImage(props: ChatBubbleProperties) {
-    if (!props.image) {
+function setExpandedState(target: ChatBubble, toValue: boolean) {
+    target.setState({
+        expanded: toValue
+    });
+}
+
+function renderImage(bindTo: ChatBubble) {
+    if (!bindTo.props.images || bindTo.props.images.length === 0) {
         return null;
     }
 
+    let { width, height } = bindTo.props.images[0];
+
     let containerStyles: React.CSSProperties = {
-        paddingTop: props.image.proportion * 100 + "%",
+        paddingTop: height / width * 100 + "%",
         width: "100%",
         position: "relative"
     };
@@ -50,20 +60,28 @@ function renderImage(props: ChatBubbleProperties) {
         position: "absolute"
     };
 
-    let items = [
-        {
-            src: props.image.url,
-            w: 1200,
-            h: 660,
-            title: "Test"
-        }
-    ];
+    let gallery: JSX.Element | undefined = undefined;
 
-    // <img src={props.image.url} style={imageStyles} />
+    if (bindTo.state && bindTo.state.expanded === true) {
+        var items = bindTo.props.images.map(image => {
+            return {
+                src: image.url,
+                w: image.width,
+                h: image.height
+            };
+        });
+
+        gallery = <PhotoSwipe items={items} onClose={() => setExpandedState(bindTo, false)} />;
+    }
 
     return (
-        <div style={containerStyles} className={styles.bubbleImageContainer}>
-            <PhotoSwipeGallery items={items} />
+        <div
+            style={containerStyles}
+            className={styles.bubbleImageContainer}
+            onClick={() => setExpandedState(bindTo, true)}
+        >
+            <img src={bindTo.props.images[0].url} style={imageStyles} />
+            {gallery}
         </div>
     );
 }
@@ -115,7 +133,7 @@ export class ChatBubble extends Component<ChatBubbleProperties, ChatBubbleState>
         return (
             <div className={styles.bubbleContainer}>
                 <div className={className} onTouchStart={this.setTouch} onTouchEnd={this.setTouch}>
-                    {renderImage(this.props)}
+                    {renderImage(this)}
                     {renderText(this.props)}
                     {renderLink(this.props)}
                 </div>
