@@ -74,12 +74,22 @@ export class Frame extends React.Component<any, PlayerState> {
                     <Controls
                         onPlay={() => this.audioElement.play()}
                         onPause={() => this.audioElement.pause()}
+                        onRewind={() => this.setTime(-10, true)}
+                        onFastForward={() => this.setTime(10, true)}
                         canPlay={this.state.playState == PlayState.Paused}
                         canPause={this.state.playState == PlayState.Playing}
                     />
                 </div>
             </div>
         );
+    }
+
+    setTime(toValue: number, relativeToCurrent: boolean) {
+        if (relativeToCurrent) {
+            this.audioElement.currentTime += toValue;
+        } else {
+            this.audioElement.currentTime = toValue;
+        }
     }
 
     async componentDidMount() {

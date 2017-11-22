@@ -6,17 +6,21 @@ interface PlayerControlProperties {
     canPause: boolean;
     onPlay: () => void;
     onPause: () => void;
+    onRewind: () => void;
+    onFastForward: () => void;
 }
 
 export function Controls(props: PlayerControlProperties) {
     return (
         <div className={styles.controls}>
+            <button onClick={props.onRewind}>- 10s</button>
             <button onClick={props.onPlay} disabled={props.canPlay == false}>
                 Play
             </button>
             <button onClick={props.onPause} disabled={props.canPause == false}>
                 Pause
             </button>
+            <button onClick={props.onFastForward}>+ 10s</button>
         </div>
     );
 }
