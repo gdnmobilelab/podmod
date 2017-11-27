@@ -3,7 +3,8 @@ import { ChatWindow } from "../chat-window/chat-window";
 import * as React from "react";
 import { runServiceWorkerCommand, ServiceWorkerNotSupportedError } from "service-worker-command-bridge";
 import { CacheSyncRequest, CacheSyncResponse } from "../../interfaces/cache-sync-request";
-import { Waveform } from "../waveform/waveform";
+// import { Waveform } from "../waveform/waveform";
+import { Progress } from "../progress/progress";
 import { Controls } from "../controls/controls";
 
 enum PlayState {
@@ -40,11 +41,15 @@ export class Frame extends React.Component<any, PlayerState> {
     render() {
         let loadedPercent = 0;
         let playbackPercent = 0;
+        let duration = 0;
+        let currentPosition = 0;
         if (this.state.download) {
             loadedPercent = this.state.download.current / this.state.download.total;
         }
         if (this.state.playback) {
             playbackPercent = this.state.playback.current / this.state.playback.total;
+            currentPosition = this.state.playback.current;
+            duration = this.state.playback.total;
         }
 
         return (
@@ -66,10 +71,15 @@ export class Frame extends React.Component<any, PlayerState> {
                     currentTime={this.state.playback ? this.state.playback.current : 0}
                 />
                 <div className={styles.controls}>
-                    <Waveform
+                    {/* <Waveform
                         dataURL="/bundles/mona-ep-1/waveform.dat"
                         downloadPercentage={loadedPercent}
                         playbackPercentage={playbackPercent}
+                    /> */}
+                    <Progress
+                        duration={duration}
+                        currentPosition={currentPosition}
+                        onChange={i => this.setTime(i, false)}
                     />
                     <Controls
                         onPlay={() => this.audioElement.play()}
