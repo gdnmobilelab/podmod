@@ -1,0 +1,14 @@
+.slider-container {
+    padding: 10px;
+}
+
+.slider {
+    width: 100%;
+    height: 20px;
+}
+
+.chapter-name {
+    text-align: center;
+    margin: 0;
+    color: #fff;
+}

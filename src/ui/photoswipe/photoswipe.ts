@@ -47,7 +47,6 @@ export class PhotoSwipe extends React.Component<PhotoSwipeProperties, PhotoSwipe
         actualContainer.innerHTML = GalleryTemplate;
         let el = actualContainer.getElementsByClassName("pswp")[0]!;
         document.body.appendChild(actualContainer);
-        console.log(PhotoSwipeLib);
         let gallery = new PhotoSwipeLib(el, PhotoSwipeUI_Default, this.props.items);
         gallery.init();
 
@@ -60,7 +59,6 @@ export class PhotoSwipe extends React.Component<PhotoSwipeProperties, PhotoSwipe
     }
 
     galleryDestroyed() {
-        console.log("DESTROY");
         if (this.props.onClose) {
             this.props.onClose();
         }

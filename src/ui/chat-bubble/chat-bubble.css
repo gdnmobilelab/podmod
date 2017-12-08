@@ -10,6 +10,11 @@
     overflow: hidden;
 }
 
+.chapter-indicator {
+    text-align: center;
+    margin: 10px 0;
+}
+
 .bubble-touch {
     background: #ccc;
 }

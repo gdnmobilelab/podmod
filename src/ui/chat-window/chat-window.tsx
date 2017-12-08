@@ -3,14 +3,14 @@ import * as React from "react";
 import * as styles from "./chat-window.css";
 import { PerformanceScrollView, AddNewItemsTo } from "performance-scroll-view";
 import { ChatBubble, ChatBubbleProperties } from "../chat-bubble/chat-bubble";
+import { Script } from "../../interfaces/script";
 
 interface ChatWindowState {
-    items?: ChatBubbleProperties[];
     visibleItems: ChatBubbleProperties[];
 }
 
 interface ChatWindowProps {
-    url: string;
+    script?: Script;
     currentTime: number;
 }
 
@@ -30,50 +30,8 @@ export class ChatWindow extends React.Component<ChatWindowProps, any> {
         this.generateItem = this.generateItem.bind(this);
 
         this.state = {
-            items: undefined,
             visibleItems: []
         };
-    }
-
-    mapResponseToScriptEntry(response: ChatBubbleProperties): ChatBubbleProperties {
-        let mappedProperties: { [key: string]: any } = {};
-        let baseURL = new URL(this.props.url, window.location.href);
-
-        if (response.images) {
-            mappedProperties.images = response.images.map(image =>
-                Object.assign({}, response.image, {
-                    url: new URL(image.url, baseURL.href).href
-                })
-            );
-        }
-
-        if (response.link) {
-            let url = new URL(response.link.url, baseURL.href);
-            let imageURL: string | undefined = undefined;
-
-            if (response.link.image) {
-                imageURL = new URL(response.link.image, baseURL.href).href;
-            }
-
-            mappedProperties.link = Object.assign({}, response.link, {
-                url: url.href,
-                domain: url.hostname,
-                image: imageURL
-            });
-        }
-        return Object.assign({}, response, mappedProperties);
-    }
-
-    async loadData() {
-        let response = await fetch(this.props.url);
-        let json = (await response.json()) as ChatBubbleProperties[];
-
-        let entries = json.map(this.mapResponseToScriptEntry.bind(this)) as ChatBubbleProperties[];
-
-        this.setState({
-            items: entries,
-            visibleItems: entries.filter(item => item.time <= this.props.currentTime)
-        });
     }
 
     generateItem(indexes: number[]) {
@@ -89,23 +47,58 @@ export class ChatWindow extends React.Component<ChatWindowProps, any> {
     }
 
     componentWillReceiveProps(newProps: ChatWindowProps) {
-        if (newProps.currentTime !== this.props.currentTime) {
+        console.log("RECEIVED", newProps.script);
+        if (!newProps.script) {
+            // if we don't have a script yet, ignore
+            return;
+        }
+        let timeChange = newProps.currentTime !== this.props.currentTime;
+        let scriptChange = newProps.script !== this.props.script;
+
+        if (scriptChange) {
+            // If the script object has changed, we want to wipe out any existing items and
+            // replace with new ones that fit the offsets.
+
+            let currentScriptItems = newProps.script.items.filter(i => i.time <= newProps.currentTime);
             this.setState({
-                visibleItems: this.state.items.filter(item => item.time <= newProps.currentTime)
+                visibleItems: currentScriptItems
+            });
+        } else if (timeChange) {
+            // Otherwise, if the time has changed we just want to add the items modified since
+
+            let itemsSinceLastTime = newProps.script.items.filter(
+                i => i.time > this.props.currentTime && i.time <= newProps.currentTime
+            );
+
+            let newChapters = newProps.script.chapters.filter(
+                c => c.time > this.props.currentTime && c.time <= newProps.currentTime
+            );
+
+            if (newChapters.length > 0) {
+                let chapterBubbles: ChatBubbleProperties[] = newChapters.map(c => {
+                    return {
+                        chapterIndicator: c,
+                        time: c.time
+                    };
+                });
+
+                itemsSinceLastTime = itemsSinceLastTime
+                    .concat(chapterBubbles)
+                    .sort((a, b) => a.time - b.time);
+            }
+
+            this.setState({
+                visibleItems: this.state.visibleItems.concat(itemsSinceLastTime)
             });
         }
-    }
-
-    componentDidMount() {
-        setTimeout(() => {
-            this.loadData();
-        }, 0);
     }
 
     render() {
         let innerView: JSX.Element | null = null;
 
-        if (this.state.items) {
+        if (this.state.visibleItems.length > 0) {
+            // We only create the view when we have items, that way we avoid the initial items
+            // being animated into view.
             innerView = (
                 <PerformanceScrollView
                     className={styles.chat}

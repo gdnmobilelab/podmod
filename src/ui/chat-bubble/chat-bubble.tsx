@@ -2,6 +2,9 @@ import * as styles from "./chat-bubble.css";
 import * as React from "react";
 import { Component } from "react";
 import { getPhotoSwipeContainer, PhotoSwipe } from "../photoswipe/photoswipe";
+import { runServiceWorkerCommand } from "service-worker-command-bridge";
+import { ShowNotification } from "../../interfaces/notification";
+import { Chapter } from "../../interfaces/script";
 
 export enum BubbleType {
     text = "text"
@@ -21,17 +24,17 @@ export interface ChatBubbleLink {
 }
 
 export interface ChatBubbleProperties {
-    type: BubbleType;
     text?: string;
     time: number;
-    image?: ChatBubbleImage;
     images?: ChatBubbleImage[];
     link?: ChatBubbleLink;
+    chapterIndicator?: Chapter;
 }
 
 interface ChatBubbleState {
     touched: boolean;
     expanded: boolean;
+    uuid: string;
 }
 
 function setExpandedState(target: ChatBubble, toValue: boolean) {
@@ -46,7 +49,7 @@ function renderImage(bindTo: ChatBubble) {
     }
 
     let { width, height } = bindTo.props.images[0];
-
+    console.log("proportion", height, width, height / width * 100, bindTo.props.images[0]);
     let containerStyles: React.CSSProperties = {
         paddingTop: height / width * 100 + "%",
         width: "100%",
@@ -114,31 +117,87 @@ function renderLink(props: ChatBubbleProperties) {
     );
 }
 
+function renderChapterIndicator(chapter: Chapter | undefined) {
+    if (!chapter) {
+        return null;
+    }
+    return <div>{chapter.name}</div>;
+}
+
+function generateRandomishUUID() {
+    // https://stackoverflow.com/a/44078785/470339
+    return (
+        Math.random()
+            .toString(36)
+            .substring(2) + new Date().getTime().toString(36)
+    );
+}
+
 export class ChatBubble extends Component<ChatBubbleProperties, ChatBubbleState> {
     constructor(props) {
         super(props);
         this.setTouch = this.setTouch.bind(this);
+        this.state = {
+            uuid: generateRandomishUUID(),
+            touched: false,
+            expanded: false
+        };
     }
 
     render() {
         let className = styles.bubble;
-        if (this.props.image) {
+
+        if (this.props.chapterIndicator) {
+            className = styles.chapterIndicator;
+        }
+
+        if (this.props.images && this.props.images.length > 0) {
             className += " " + styles.bubbleFullWidth;
         }
 
-        if (this.state && this.state.touched) {
+        if (this.state.touched) {
             className += " " + styles.bubbleTouch;
         }
 
         return (
             <div className={styles.bubbleContainer}>
                 <div className={className} onTouchStart={this.setTouch} onTouchEnd={this.setTouch}>
+                    {renderChapterIndicator(this.props.chapterIndicator)}
                     {renderImage(this)}
                     {renderText(this.props)}
                     {renderLink(this.props)}
                 </div>
             </div>
         );
+    }
+
+    componentDidMount() {
+        if (document.visibilityState === "visible") {
+            // If the user is currently on the page we don't show these notifications
+            return;
+        }
+
+        let notificationOptions: ShowNotification = {
+            title: "Mona from the Guardian",
+            icon: "/bundles/mona-ep-1/mona-headshot-round.png",
+            body: this.props.text,
+            data: {
+                uuid: this.state.uuid
+            }
+        };
+
+        if (this.props.images && this.props.images.length > 0) {
+            notificationOptions.image = this.props.images[0].url;
+        }
+
+        runServiceWorkerCommand<ShowNotification, void>("show-notification", notificationOptions);
+    }
+
+    async componentWillUnmount() {
+        runServiceWorkerCommand<any, void>("remove-notification", {
+            uuid: this.state.uuid
+        });
+        // console.log(existing);
     }
 
     setTouch(e: React.TouchEvent<HTMLDivElement>) {

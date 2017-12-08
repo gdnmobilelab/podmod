@@ -1,9 +1,9 @@
 import { ShowNotification } from "./interfaces/notification";
-import { WorkerBridge } from "./bridge/worker-bridge";
+// import { WorkerBridge } from "./bridge/worker-bridge";
 import { NotificationBridge, NotificationBridgeInstance } from "./bridge/notification";
 import { CacheSync } from "./io/cache-sync";
 import { CommandListener } from "service-worker-command-bridge";
-
+// import * as deepEqual from "deep-equal";
 import { CacheSyncRequest, CacheSyncResponse } from "./interfaces/cache-sync-request";
 
 declare var self: ServiceWorkerGlobalScope;
@@ -47,10 +47,39 @@ CommandListener.listen();
 self.addEventListener("install", e => self.skipWaiting());
 self.addEventListener("activate", e => self.clients.claim());
 
-// CommandListener.bind("show-notification", (n: ShowNotification) => {
-//     console.log("here");
-//     self.registration.showNotification(n.title);
-// });
+CommandListener.bind("show-notification", (n: ShowNotification) => {
+    self.registration.showNotification(n.title, {
+        icon: n.icon,
+        body: n.body,
+        data: n.data
+    } as any);
+});
+
+CommandListener.bind("get-notifications", async (n: ShowNotification) => {
+    let notifications = await self.registration.getNotifications();
+    return notifications.map(n => {
+        return {
+            title: n.title,
+            body: n.body,
+            icon: n.icon,
+            data: n.data
+        } as ShowNotification;
+    });
+});
+
+CommandListener.bind("remove-notification", async (predicate: any) => {
+    let notifications = (await self.registration.getNotifications()) as Notification[];
+    notifications.forEach(notification => {
+        for (let key in predicate) {
+            if (predicate[key] !== (notification as any).data[key]) {
+                return;
+            }
+        }
+        notification.close();
+    });
+});
+
+// CommandListener.bind("remove-notification")
 
 // CommandListener.listen();
 

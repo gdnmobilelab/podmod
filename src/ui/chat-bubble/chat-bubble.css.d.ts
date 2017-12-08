@@ -1,5 +1,6 @@
 export const bubbleContainer: string;
 export const bubble: string;
+export const chapterIndicator: string;
 export const bubbleTouch: string;
 export const bubbleText: string;
 export const bubbleLink: string;

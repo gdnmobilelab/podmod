@@ -6,6 +6,7 @@ import { CacheSyncRequest, CacheSyncResponse } from "../../interfaces/cache-sync
 // import { Waveform } from "../waveform/waveform";
 import { Progress } from "../progress/progress";
 import { Controls } from "../controls/controls";
+import { Script, mapScriptEntries, makeRelative } from "../../interfaces/script";
 
 enum PlayState {
     Paused,
@@ -23,6 +24,7 @@ interface PlayerState {
         total: number;
     };
     playState: PlayState;
+    script?: Script;
 }
 
 export class Frame extends React.Component<any, PlayerState> {
@@ -36,6 +38,19 @@ export class Frame extends React.Component<any, PlayerState> {
         this.timeUpdate = this.timeUpdate.bind(this);
         this.playStateChange = this.playStateChange.bind(this);
         this.audioProgress = this.audioProgress.bind(this);
+    }
+
+    async loadData() {
+        let absoluteURL = new URL("/bundles/mona-ep-1/script.json", window.location.href);
+        let response = await fetch(absoluteURL.href);
+        let json = (await response.json()) as Script;
+
+        json.items = mapScriptEntries(json.items, absoluteURL);
+        json.audioFile = makeRelative(json.audioFile, absoluteURL.href);
+
+        this.setState({
+            script: json
+        });
     }
 
     render() {
@@ -52,10 +67,12 @@ export class Frame extends React.Component<any, PlayerState> {
             duration = this.state.playback.total;
         }
 
-        return (
-            <div className={styles.frame}>
+        let audio: JSX.Element | null = null;
+
+        if (this.state.script) {
+            audio = (
                 <audio
-                    src="/bundles/mona-ep-1/Data_Pod_v4_mp3.mp3"
+                    src={this.state.script.audioFile}
                     preload="auto"
                     onProgress={this.audioProgress}
                     onTimeUpdate={this.timeUpdate}
@@ -65,9 +82,15 @@ export class Frame extends React.Component<any, PlayerState> {
                     style={{ position: "absolute", zIndex: 100 }}
                     ref={el => (this.audioElement = el as HTMLAudioElement)}
                 />
+            );
+        }
+
+        return (
+            <div className={styles.frame}>
+                {audio}
 
                 <ChatWindow
-                    url="/bundles/mona-ep-1/script.json"
+                    script={this.state.script}
                     currentTime={this.state.playback ? this.state.playback.current : 0}
                 />
                 <div className={styles.controls}>
@@ -80,6 +103,7 @@ export class Frame extends React.Component<any, PlayerState> {
                         duration={duration}
                         currentPosition={currentPosition}
                         onChange={i => this.setTime(i, false)}
+                        chapters={this.state.script ? this.state.script.chapters : undefined}
                     />
                     <Controls
                         onPlay={() => this.audioElement.play()}
@@ -120,6 +144,26 @@ export class Frame extends React.Component<any, PlayerState> {
             if (ex instanceof ServiceWorkerNotSupportedError === false) {
                 throw ex;
             }
+        }
+
+        this.loadData();
+
+        if ("mediaSession" in navigator) {
+            let mediaSession = (navigator as any).mediaSession;
+
+            mediaSession.metadata = new MediaMetadata({
+                title: "Episode 1",
+                artist: "The Guardian",
+                album: "Untitled Mona Chalabi Podcast",
+                artwork: [{ src: "/bundles/mona-ep-1/pee_thumb.png", sizes: "325x333", type: "image/png" }]
+            });
+
+            // mediaSession.setActionHandler("play", function() {});
+            // mediaSession.setActionHandler("pause", function() {});
+            mediaSession.setActionHandler("seekbackward", function() {});
+            mediaSession.setActionHandler("seekforward", function() {});
+            mediaSession.setActionHandler("previoustrack", function() {});
+            mediaSession.setActionHandler("nexttrack", function() {});
         }
     }
 
@@ -173,3 +217,5 @@ export class Frame extends React.Component<any, PlayerState> {
         }
     }
 }
+
+declare var MediaMetadata;
