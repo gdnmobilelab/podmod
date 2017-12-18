@@ -1,5 +1,6 @@
 .bubble-container {
     text-align: right;
+    margin-left: auto;
 }
 
 .bubble {
@@ -19,14 +20,19 @@
     background: #ccc;
 }
 
-.bubble-text {
+.bubble-text-padding {
     padding: 10px 15px;
+}
+
+.bubble-text {
+    display: inline;
 }
 
 .bubble-link {
     display: flex;
     text-decoration: none;
     color: #000;
+    margin: 10px;
 }
 
 .bubble-link-title {

@@ -25,6 +25,7 @@ interface PlayerState {
     };
     playState: PlayState;
     script?: Script;
+    scriptElements?: JSX.Element[];
 }
 
 export class Frame extends React.Component<any, PlayerState> {
@@ -41,15 +42,15 @@ export class Frame extends React.Component<any, PlayerState> {
     }
 
     async loadData() {
-        let absoluteURL = new URL("/bundles/mona-ep-1/script.json", window.location.href);
+        let absoluteURL = new URL("./bundles/mona-ep-1/script.json", window.location.href);
         let response = await fetch(absoluteURL.href);
         let json = (await response.json()) as Script;
 
-        json.items = mapScriptEntries(json.items, absoluteURL);
         json.audioFile = makeRelative(json.audioFile, absoluteURL.href);
 
         this.setState({
-            script: json
+            script: json,
+            scriptElements: mapScriptEntries(json.items, absoluteURL)
         });
     }
 
@@ -85,6 +86,8 @@ export class Frame extends React.Component<any, PlayerState> {
             );
         }
 
+        console.log("state", this.state);
+
         return (
             <div className={styles.frame}>
                 {audio}
@@ -92,6 +95,7 @@ export class Frame extends React.Component<any, PlayerState> {
                 <ChatWindow
                     script={this.state.script}
                     currentTime={this.state.playback ? this.state.playback.current : 0}
+                    elements={this.state.scriptElements}
                 />
                 <div className={styles.controls}>
                     {/* <Waveform
@@ -128,18 +132,18 @@ export class Frame extends React.Component<any, PlayerState> {
 
     async componentDidMount() {
         try {
-            let response = await runServiceWorkerCommand<CacheSyncRequest, CacheSyncResponse>("cachesync", {
-                cacheName: "mona-ep-1",
-                payloadURL: "/bundles/mona-ep-1/files.json"
-            });
-            response.progressEvents.onmessage = (e: MessageEvent) => {
-                this.setState({
-                    download: {
-                        current: e.data.current,
-                        total: e.data.total
-                    }
-                });
-            };
+            // let response = await runServiceWorkerCommand<CacheSyncRequest, CacheSyncResponse>("cachesync", {
+            //     cacheName: "mona-ep-1",
+            //     payloadURL: "./bundles/mona-ep-1/files.json"
+            // });
+            // response.progressEvents.onmessage = (e: MessageEvent) => {
+            //     this.setState({
+            //         download: {
+            //             current: e.data.current,
+            //             total: e.data.total
+            //         }
+            //     });
+            // };
         } catch (ex) {
             if (ex instanceof ServiceWorkerNotSupportedError === false) {
                 throw ex;
@@ -155,7 +159,7 @@ export class Frame extends React.Component<any, PlayerState> {
                 title: "Episode 1",
                 artist: "The Guardian",
                 album: "Untitled Mona Chalabi Podcast",
-                artwork: [{ src: "/bundles/mona-ep-1/pee_thumb.png", sizes: "325x333", type: "image/png" }]
+                artwork: [{ src: "./bundles/mona-ep-1/pee_thumb.png", sizes: "325x333", type: "image/png" }]
             });
 
             // mediaSession.setActionHandler("play", function() {});
@@ -182,7 +186,6 @@ export class Frame extends React.Component<any, PlayerState> {
                     total: this.audioElement.duration
                 }
             });
-            console.log("TIME UPDATE", this.audioElement.currentTime);
         }, untilNextSecond * 1000);
     }
 
@@ -193,9 +196,7 @@ export class Frame extends React.Component<any, PlayerState> {
         }
 
         let bufferEnd = e.target.buffered.end(e.target.buffered.length - 1);
-        console.log("end");
         if ("serviceWorker" in navigator == false) {
-            console.log("send end", bufferEnd);
             this.setState({
                 download: {
                     current: bufferEnd,
@@ -214,6 +215,8 @@ export class Frame extends React.Component<any, PlayerState> {
 
         if (this.audioElement.paused) {
             clearTimeout(this.nextSecondTimeout);
+        } else if ("requestPermission" in Notification) {
+            Notification.requestPermission();
         }
     }
 }

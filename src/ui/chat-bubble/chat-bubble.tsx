@@ -4,7 +4,7 @@ import { Component } from "react";
 import { getPhotoSwipeContainer, PhotoSwipe } from "../photoswipe/photoswipe";
 import { runServiceWorkerCommand } from "service-worker-command-bridge";
 import { ShowNotification } from "../../interfaces/notification";
-import { Chapter } from "../../interfaces/script";
+import { Chapter, makeRelative } from "../../interfaces/script";
 
 export enum BubbleType {
     text = "text"
@@ -34,7 +34,6 @@ export interface ChatBubbleProperties {
 interface ChatBubbleState {
     touched: boolean;
     expanded: boolean;
-    uuid: string;
 }
 
 function setExpandedState(target: ChatBubble, toValue: boolean) {
@@ -89,11 +88,17 @@ function renderImage(bindTo: ChatBubble) {
     );
 }
 
-function renderText(props: ChatBubbleProperties) {
-    if (!props.text) {
+function renderText(bindTo: ChatBubble) {
+    if (!bindTo.props.text) {
         return null;
     }
-    return <div className={styles.bubbleText}>{props.text}</div>;
+    return (
+        <div className={styles.bubbleTextPadding}>
+            <div className={styles.bubbleText} ref={el => (bindTo.textElement = el)}>
+                {bindTo.props.text}
+            </div>
+        </div>
+    );
 }
 
 function renderLink(props: ChatBubbleProperties) {
@@ -124,21 +129,14 @@ function renderChapterIndicator(chapter: Chapter | undefined) {
     return <div>{chapter.name}</div>;
 }
 
-function generateRandomishUUID() {
-    // https://stackoverflow.com/a/44078785/470339
-    return (
-        Math.random()
-            .toString(36)
-            .substring(2) + new Date().getTime().toString(36)
-    );
-}
-
 export class ChatBubble extends Component<ChatBubbleProperties, ChatBubbleState> {
+    containerElement: HTMLDivElement | null;
+    textElement: HTMLDivElement | null;
+
     constructor(props) {
         super(props);
         this.setTouch = this.setTouch.bind(this);
         this.state = {
-            uuid: generateRandomishUUID(),
             touched: false,
             expanded: false
         };
@@ -160,11 +158,11 @@ export class ChatBubble extends Component<ChatBubbleProperties, ChatBubbleState>
         }
 
         return (
-            <div className={styles.bubbleContainer}>
+            <div className={styles.bubbleContainer} ref={el => (this.containerElement = el)}>
                 <div className={className} onTouchStart={this.setTouch} onTouchEnd={this.setTouch}>
                     {renderChapterIndicator(this.props.chapterIndicator)}
                     {renderImage(this)}
-                    {renderText(this.props)}
+                    {renderText(this)}
                     {renderLink(this.props)}
                 </div>
             </div>
@@ -172,32 +170,52 @@ export class ChatBubble extends Component<ChatBubbleProperties, ChatBubbleState>
     }
 
     componentDidMount() {
-        if (document.visibilityState === "visible") {
-            // If the user is currently on the page we don't show these notifications
-            return;
+        if (this.textElement && this.containerElement) {
+            // If it's just a text bubble it doesn't automatically change width according to the size
+            // of the text container. We have to manually force it to do so.
+
+            this.containerElement.style.width = this.textElement.getBoundingClientRect().width + 50 + "px";
         }
 
-        let notificationOptions: ShowNotification = {
-            title: "Mona from the Guardian",
-            icon: "/bundles/mona-ep-1/mona-headshot-round.png",
-            body: this.props.text,
-            data: {
-                uuid: this.state.uuid
-            }
-        };
+        // if (document.visibilityState === "visible") {
+        //     // If the user is currently on the page we don't show these notifications
+        //     return;
+        // }
 
-        if (this.props.images && this.props.images.length > 0) {
-            notificationOptions.image = this.props.images[0].url;
-        }
+        // if (this.props.chapterIndicator) {
+        //     // We don't show notifications for chapter changes
+        //     return;
+        // }
 
-        runServiceWorkerCommand<ShowNotification, void>("show-notification", notificationOptions);
-    }
+        // let notificationOptions: ShowNotification = {
+        //     title: "Mona from the Guardian",
+        //     icon: makeRelative("./bundles/mona-ep-1/mona-headshot-round.png", window.location.href),
+        //     body: this.props.text,
+        //     badge: "https://www.gdnmobilelab.com/uk-election-2017/images/gdn_badge.png",
+        //     data: {
+        //         uuid: this.state.uuid
+        //     }
+        // };
 
-    async componentWillUnmount() {
-        runServiceWorkerCommand<any, void>("remove-notification", {
-            uuid: this.state.uuid
-        });
-        // console.log(existing);
+        // if (this.props.images && this.props.images.length > 0) {
+        //     notificationOptions.image = makeRelative(this.props.images[0].url, window.location.href);
+        // }
+
+        // if (this.props.link) {
+        //     notificationOptions.body = this.props.link.domain;
+        //     notificationOptions.actions = [
+        //         {
+        //             action: "open-link",
+        //             title: "Open Link"
+        //         }
+        //     ];
+        // }
+
+        // runServiceWorkerCommand<ShowNotification, void>("show-notification", notificationOptions).catch(
+        //     err => {
+        //         console.error(err);
+        //     }
+        // );
     }
 
     setTouch(e: React.TouchEvent<HTMLDivElement>) {

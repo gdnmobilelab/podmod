@@ -11,6 +11,7 @@ interface ChatWindowState {
 
 interface ChatWindowProps {
     script?: Script;
+    elements?: JSX.Element[];
     currentTime: number;
 }
 
@@ -37,17 +38,17 @@ export class ChatWindow extends React.Component<ChatWindowProps, any> {
     generateItem(indexes: number[]) {
         return Promise.resolve(
             indexes.map(idx => {
-                let properties = this.state.visibleItems[idx];
-                if (!properties) {
-                    throw new Error("No item at index requested");
-                }
-                return <ChatBubble {...properties} />;
+                return this.props.elements![idx] || null;
+                // let properties = this.state.visibleItems[idx];
+                // if (!properties) {
+                //     throw new Error("No item at index requested");
+                // }
+                // return <ChatBubble {...properties} />;
             })
         );
     }
 
     componentWillReceiveProps(newProps: ChatWindowProps) {
-        console.log("RECEIVED", newProps.script);
         if (!newProps.script) {
             // if we don't have a script yet, ignore
             return;
@@ -55,42 +56,29 @@ export class ChatWindow extends React.Component<ChatWindowProps, any> {
         let timeChange = newProps.currentTime !== this.props.currentTime;
         let scriptChange = newProps.script !== this.props.script;
 
-        if (scriptChange) {
-            // If the script object has changed, we want to wipe out any existing items and
-            // replace with new ones that fit the offsets.
-
-            let currentScriptItems = newProps.script.items.filter(i => i.time <= newProps.currentTime);
-            this.setState({
-                visibleItems: currentScriptItems
-            });
-        } else if (timeChange) {
-            // Otherwise, if the time has changed we just want to add the items modified since
-
-            let itemsSinceLastTime = newProps.script.items.filter(
-                i => i.time > this.props.currentTime && i.time <= newProps.currentTime
-            );
-
-            let newChapters = newProps.script.chapters.filter(
-                c => c.time > this.props.currentTime && c.time <= newProps.currentTime
-            );
-
-            if (newChapters.length > 0) {
-                let chapterBubbles: ChatBubbleProperties[] = newChapters.map(c => {
-                    return {
-                        chapterIndicator: c,
-                        time: c.time
-                    };
-                });
-
-                itemsSinceLastTime = itemsSinceLastTime
-                    .concat(chapterBubbles)
-                    .sort((a, b) => a.time - b.time);
-            }
-
-            this.setState({
-                visibleItems: this.state.visibleItems.concat(itemsSinceLastTime)
-            });
+        if (timeChange === false && scriptChange === false) {
+            return;
         }
+
+        let newVisibleItems: ChatBubbleProperties[] = newProps.script.items.filter(
+            i => i.time <= newProps.currentTime
+        );
+
+        let newChapters = newProps.script.chapters.filter(c => c.time <= newProps.currentTime);
+
+        if (newChapters.length > 0) {
+            let chapterBubbles: ChatBubbleProperties[] = newChapters.map(c => {
+                return {
+                    chapterIndicator: c,
+                    time: c.time
+                };
+            });
+
+            newVisibleItems = newVisibleItems.concat(chapterBubbles).sort((a, b) => a.time - b.time);
+        }
+        this.setState({
+            visibleItems: newVisibleItems
+        });
     }
 
     render() {

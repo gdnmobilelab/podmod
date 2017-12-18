@@ -51,7 +51,10 @@ CommandListener.bind("show-notification", (n: ShowNotification) => {
     self.registration.showNotification(n.title, {
         icon: n.icon,
         body: n.body,
-        data: n.data
+        data: n.data,
+        badge: n.badge,
+        actions: n.actions,
+        image: n.image
     } as any);
 });
 
@@ -62,7 +65,7 @@ CommandListener.bind("get-notifications", async (n: ShowNotification) => {
             title: n.title,
             body: n.body,
             icon: n.icon,
-            data: n.data
+            data: (n as any).data
         } as ShowNotification;
     });
 });
@@ -77,6 +80,12 @@ CommandListener.bind("remove-notification", async (predicate: any) => {
         }
         notification.close();
     });
+});
+
+self.addEventListener("notificationclick", async e => {
+    e.notification.close();
+    let allClients = await self.clients.matchAll();
+    (allClients[0] as WindowClient).focus();
 });
 
 // CommandListener.bind("remove-notification")
