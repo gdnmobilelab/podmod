@@ -16,7 +16,12 @@ let container = document.createElement("div");
 container.className = main;
 document.body.appendChild(container);
 
-render(createElement(Frame, {}), container);
+render(
+    createElement(Frame, {
+        scriptURL: new URL("./bundles/mona-ep-1/script.json", window.location.href).href
+    }),
+    container
+);
 
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("worker.js");

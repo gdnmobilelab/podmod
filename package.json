@@ -4,8 +4,10 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "make-waveform": "bash ./tasks/make-waveform.sh",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "dev": "webpack-dev-server",
+        "build": "webpack",
+        "deploy-staging":
+            "npm run build && aws s3 cp --recursive ./dist/ s3://www.stg.gdnmobilelab.com/podcast-test --acl \"public-read\" --cache-control=\"no-cache\""
     },
     "author": "",
     "license": "ISC",

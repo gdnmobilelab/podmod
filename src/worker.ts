@@ -84,6 +84,12 @@ CommandListener.bind("remove-notification", async (predicate: any) => {
 
 self.addEventListener("notificationclick", async e => {
     e.notification.close();
+
+    if (e.action === "open-link") {
+        self.clients.openWindow((e.notification as any).data.link_url);
+        return;
+    }
+
     let allClients = await self.clients.matchAll();
     (allClients[0] as WindowClient).focus();
 });

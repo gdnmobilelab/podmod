@@ -6,6 +6,7 @@ import { CacheSyncRequest, CacheSyncResponse } from "../../interfaces/cache-sync
 // import { Waveform } from "../waveform/waveform";
 import { Progress } from "../progress/progress";
 import { Controls } from "../controls/controls";
+import { Header } from "../header/header";
 import { Script, mapScriptEntries, makeRelative } from "../../interfaces/script";
 
 enum PlayState {
@@ -28,7 +29,11 @@ interface PlayerState {
     scriptElements?: JSX.Element[];
 }
 
-export class Frame extends React.Component<any, PlayerState> {
+interface PlayerProps {
+    scriptURL: string;
+}
+
+export class Frame extends React.Component<PlayerProps, PlayerState> {
     audioElement: HTMLAudioElement;
 
     constructor(props) {
@@ -42,7 +47,7 @@ export class Frame extends React.Component<any, PlayerState> {
     }
 
     async loadData() {
-        let absoluteURL = new URL("./bundles/mona-ep-1/script.json", window.location.href);
+        let absoluteURL = new URL(this.props.scriptURL, window.location.href);
         let response = await fetch(absoluteURL.href);
         let json = (await response.json()) as Script;
 
@@ -86,12 +91,13 @@ export class Frame extends React.Component<any, PlayerState> {
             );
         }
 
-        console.log("state", this.state);
-
         return (
             <div className={styles.frame}>
                 {audio}
-
+                <Header
+                    metadata={this.state.script ? this.state.script.metadata : undefined}
+                    relativeTo={this.props.scriptURL}
+                />
                 <ChatWindow
                     script={this.state.script}
                     currentTime={this.state.playback ? this.state.playback.current : 0}
