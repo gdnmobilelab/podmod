@@ -213,8 +213,12 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
             mediaSession.setActionHandler("seekforward", () => {
                 this.setTime(10, true);
             });
-            mediaSession.setActionHandler("previoustrack", function() {});
-            mediaSession.setActionHandler("nexttrack", function() {});
+            mediaSession.setActionHandler("previoustrack", () => {
+                this.moveChapter(-1);
+            });
+            mediaSession.setActionHandler("nexttrack", () => {
+                this.moveChapter(1);
+            });
         }
     }
 
@@ -279,6 +283,29 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
         } else if ("requestPermission" in Notification) {
             Notification.requestPermission();
         }
+    }
+
+    componentDidUpdate(oldProps, oldState: PlayerState) {
+        if ("mediaSession" in navigator === false) {
+            return;
+        }
+
+        if (!oldState.script || oldState.currentChapterName === this.state.currentChapterName) {
+            return;
+        }
+
+        if (!this.state.script) {
+            return;
+        }
+
+        let mediaSession = (navigator as any).mediaSession;
+
+        mediaSession.metadata = new MediaMetadata({
+            title: this.state.currentChapterName,
+            artist: "The Guardian",
+            album: this.state.script.metadata.title,
+            artwork: [{ src: "./bundles/mona-ep-1/pee_thumb.png", sizes: "325x333", type: "image/png" }]
+        });
     }
 }
 
