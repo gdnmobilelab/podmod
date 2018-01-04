@@ -27,6 +27,7 @@ interface PlayerState {
     playState: PlayState;
     script?: Script;
     scriptElements?: JSX.Element[];
+    currentChapterName?: string;
 }
 
 interface PlayerProps {
@@ -84,7 +85,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                     onTimeUpdate={this.timeUpdate}
                     onPlay={this.playStateChange}
                     onPause={this.playStateChange}
-                    title="TEST CONTENT"
+                    title={this.state.currentChapterName}
                     style={{ position: "absolute", zIndex: 100 }}
                     ref={el => (this.audioElement = el as HTMLAudioElement)}
                 />
@@ -113,19 +114,55 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                         duration={duration}
                         currentPosition={currentPosition}
                         onChange={i => this.setTime(i, false)}
-                        chapters={this.state.script ? this.state.script.chapters : undefined}
+                        currentChapterName={this.state.currentChapterName}
                     />
                     <Controls
                         onPlay={() => this.audioElement.play()}
                         onPause={() => this.audioElement.pause()}
                         onRewind={() => this.setTime(-10, true)}
                         onFastForward={() => this.setTime(10, true)}
+                        onSkipBack={() => this.moveChapter(-1)}
+                        onSkipForward={() => this.moveChapter(1)}
                         canPlay={this.state.playState == PlayState.Paused}
                         canPause={this.state.playState == PlayState.Playing}
                     />
                 </div>
             </div>
         );
+    }
+
+    moveChapter(byValue: number) {
+        if (!this.state.script || !this.state.playback) {
+            throw new Error("Cannot move chapters before the script is loaded.");
+        }
+
+        if (byValue !== 1 && byValue !== -1) {
+            throw new Error("Can only move chapters by one right now");
+        }
+
+        for (let i = 0; i < this.state.script.chapters.length; i++) {
+            let time = this.state.script.chapters[i].time;
+
+            if (time < this.state.playback.current && i < this.state.script.chapters.length - 1) {
+                continue;
+            }
+
+            // If the time is greater than our current position, then we know this
+            // is the next chapter.
+
+            if (byValue === 1) {
+                // If we're moving ahead then we can set it to the time of the current
+                // chapter.
+                console.info("Skipping forward to chapter at", time);
+                this.setTime(time, false);
+            } else {
+                let previousChapterTime = this.state.script.chapters[i - 1].time;
+                console.info("Skipping back to chapter at", previousChapterTime);
+                this.setTime(previousChapterTime, false);
+            }
+
+            break;
+        }
     }
 
     setTime(toValue: number, relativeToCurrent: boolean) {
@@ -170,8 +207,12 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
 
             // mediaSession.setActionHandler("play", function() {});
             // mediaSession.setActionHandler("pause", function() {});
-            mediaSession.setActionHandler("seekbackward", function() {});
-            mediaSession.setActionHandler("seekforward", function() {});
+            mediaSession.setActionHandler("seekbackward", () => {
+                this.setTime(-10, true);
+            });
+            mediaSession.setActionHandler("seekforward", () => {
+                this.setTime(10, true);
+            });
             mediaSession.setActionHandler("previoustrack", function() {});
             mediaSession.setActionHandler("nexttrack", function() {});
         }
@@ -186,11 +227,22 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
 
         clearTimeout(this.nextSecondTimeout);
         this.nextSecondTimeout = setTimeout(() => {
+            let chapterName: string | undefined = undefined;
+            if (this.state.script && this.state.script.chapters) {
+                for (let i = 0; i < this.state.script.chapters.length; i++) {
+                    if (this.state.script.chapters[i].time > this.audioElement.currentTime) {
+                        break;
+                    }
+                    chapterName = this.state.script.chapters[i].name;
+                }
+            }
+
             this.setState({
                 playback: {
                     current: this.audioElement.currentTime,
                     total: this.audioElement.duration
-                }
+                },
+                currentChapterName: chapterName
             });
         }, untilNextSecond * 1000);
     }
@@ -202,7 +254,10 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
         }
 
         let bufferEnd = e.target.buffered.end(e.target.buffered.length - 1);
-        if ("serviceWorker" in navigator == false) {
+        if ("serviceWorker" in navigator === false) {
+            // If we have a service worker we report progress based on adding files
+            // to the cache. But if not we only have the local copy.
+
             this.setState({
                 download: {
                     current: bufferEnd,

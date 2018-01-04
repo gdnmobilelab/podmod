@@ -6,7 +6,7 @@ interface PlayerProgressProps {
     duration: number;
     currentPosition: number;
     onChange: (number) => void;
-    chapters?: Chapter[];
+    currentChapterName?: string;
 }
 
 interface PlayerProgressState {
@@ -18,13 +18,8 @@ export class Progress extends React.Component<PlayerProgressProps, PlayerProgres
 
     render() {
         let chapterName = "";
-        if (this.props.chapters) {
-            for (let i = 0; i < this.props.chapters.length; i++) {
-                if (this.props.chapters[i].time > this.props.currentPosition) {
-                    break;
-                }
-                chapterName = this.props.chapters[i].name;
-            }
+        if (this.props.currentChapterName) {
+            chapterName = this.props.currentChapterName;
         }
 
         return (

@@ -8,22 +8,25 @@ interface HeaderProperties {
 }
 
 export function Header(props: HeaderProperties) {
-    if (!props.metadata) {
-        return null;
-    }
+    // Get rid of this until we have a design.
+    return null;
 
-    let imgUrl = makeRelative(props.metadata.avatarFile, props.relativeTo);
+    // if (!props.metadata) {
+    //     return null;
+    // }
 
-    return (
-        <div className={styles.header}>
-            {/* <div className={styles.headerBackground} /> */}
-            <div>
-                <img src={imgUrl} className={styles.headerAvatar} />
-            </div>
-            <div className={styles.headerTextContainer}>
-                <h1>{props.metadata.title}</h1>
-                <p>{props.metadata.description}</p>
-            </div>
-        </div>
-    );
+    // let imgUrl = makeRelative(props.metadata.avatarFile, props.relativeTo);
+
+    // return (
+    //     <div className={styles.header}>
+    //         {/* <div className={styles.headerBackground} /> */}
+    //         <div>
+    //             <img src={imgUrl} className={styles.headerAvatar} />
+    //         </div>
+    //         <div className={styles.headerTextContainer}>
+    //             <h1>{props.metadata.title}</h1>
+    //             <p>{props.metadata.description}</p>
+    //         </div>
+    //     </div>
+    // );
 }
