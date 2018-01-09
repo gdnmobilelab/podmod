@@ -6,7 +6,7 @@ import { ChatBubble, ChatBubbleProperties } from "../chat-bubble/chat-bubble";
 import { Script } from "../../interfaces/script";
 
 interface ChatWindowState {
-    visibleItems: ChatBubbleProperties[];
+    numberOfVisibleItems: number;
 }
 
 interface ChatWindowProps {
@@ -22,7 +22,7 @@ function easeOutBack(t: number, b: number, c: number, d: number, s: number = 0) 
     return c * ((t = t / d - 1) * t * ((s + 1) * t + s) + 1) + b;
 }
 
-export class ChatWindow extends React.Component<ChatWindowProps, any> {
+export class ChatWindow extends React.Component<ChatWindowProps, ChatWindowState> {
     container: HTMLDivElement;
 
     constructor(props) {
@@ -31,7 +31,7 @@ export class ChatWindow extends React.Component<ChatWindowProps, any> {
         this.generateItem = this.generateItem.bind(this);
 
         this.state = {
-            visibleItems: []
+            numberOfVisibleItems: 0
         };
     }
 
@@ -67,38 +67,44 @@ export class ChatWindow extends React.Component<ChatWindowProps, any> {
 
         let newChapters = newProps.script.chapters.filter(c => c.time <= newProps.currentTime);
 
-        if (newChapters.length > 0) {
-            let chapterBubbles: ChatBubbleProperties[] = newChapters.map(c => {
-                return {
-                    chapterIndicator: c,
-                    time: c.time
-                };
-            });
-
-            newVisibleItems = newVisibleItems.concat(chapterBubbles).sort((a, b) => a.time - b.time);
-        }
-        console.log(newVisibleItems);
         this.setState({
-            visibleItems: newVisibleItems
+            numberOfVisibleItems: newVisibleItems.length + newChapters.length
         });
+
+        // let newChapters = newProps.script.chapters.filter(c => c.time <= newProps.currentTime);
+
+        // if (newChapters.length > 0) {
+        //     let chapterBubbles: ChatBubbleProperties[] = newChapters.map(c => {
+        //         return {
+        //             chapterIndicator: c,
+        //             time: c.time
+        //         };
+        //     });
+
+        //     newVisibleItems = newVisibleItems.concat(chapterBubbles).sort((a, b) => a.time - b.time);
+        // }
+        // console.log(newVisibleItems);
+        // this.setState({
+        //     visibleItems: newVisibleItems
+        // });
     }
 
     render() {
         let innerView: JSX.Element | null = null;
 
-        if (this.state.visibleItems.length > 0) {
+        if (this.state.numberOfVisibleItems > 0) {
             // We only create the view when we have items, that way we avoid the initial items
             // being animated into view.
             innerView = (
                 <PerformanceScrollView
                     className={styles.chat}
-                    numberOfItems={this.state.visibleItems.length}
+                    numberOfItems={this.state.numberOfVisibleItems}
                     itemBufferSize={20}
                     itemGenerator={this.generateItem}
                     addNewItemsTo={AddNewItemsTo.Bottom}
                     animationEaseFunction={easeOutBack}
                     animationDuration={750}
-                    startIndex={this.state.visibleItems.length - 1}
+                    startIndex={this.state.numberOfVisibleItems - 1}
                 />
             );
         }

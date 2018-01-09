@@ -27,7 +27,7 @@ export function makeRelative(url: string, baseURL: string) {
     return new URL(url, baseURL).href;
 }
 
-function mapScriptEntry(response: ChatBubbleProperties, baseURL: URL): JSX.Element {
+function mapScriptEntry(response: ChatBubbleProperties, index: number, baseURL: URL): JSX.Element {
     let mappedProperties: ChatBubbleProperties = {
         time: response.time
     };
@@ -43,7 +43,7 @@ function mapScriptEntry(response: ChatBubbleProperties, baseURL: URL): JSX.Eleme
         );
     }
 
-    let elements: JSX.Element[] = [<ChatBubble {...mappedProperties} />];
+    let elements: JSX.Element[] = [<ChatBubble {...mappedProperties} key={`item_${index}_main`} />];
 
     if (response.link) {
         let url = new URL(response.link.url, baseURL.href);
@@ -63,7 +63,7 @@ function mapScriptEntry(response: ChatBubbleProperties, baseURL: URL): JSX.Eleme
             }
         };
 
-        elements.push(<ChatBubble {...secondItemProperties} />);
+        elements.push(<ChatBubble {...secondItemProperties} key={`item_${index}_link`} />);
     }
 
     let notificationOptions: ShowNotification = {
@@ -89,24 +89,28 @@ function mapScriptEntry(response: ChatBubbleProperties, baseURL: URL): JSX.Eleme
         notificationOptions.image = mappedProperties.images[0].url;
     }
 
-    return <BubbleGroup notification={notificationOptions}>{elements}</BubbleGroup>;
+    return (
+        <BubbleGroup notification={notificationOptions} key={"item_" + index}>
+            {elements}
+        </BubbleGroup>
+    );
 }
 
 export function mapScriptEntries(script: Script, baseURL: URL) {
     let items: JSX.Element[] = [];
     let currentChapterIndex = 0;
 
-    script.items.forEach(scriptItem => {
+    script.items.forEach((scriptItem, idx) => {
         let currentChapter = script.chapters[currentChapterIndex];
         if (currentChapter && currentChapter.time < scriptItem.time) {
             items.push(
-                <BubbleGroup>
+                <BubbleGroup key={"chapter_" + currentChapterIndex}>
                     <ChatBubble chapterIndicator={currentChapter} time={currentChapter.time} />
                 </BubbleGroup>
             );
             currentChapterIndex++;
         }
-        items.push(mapScriptEntry(scriptItem, baseURL));
+        items.push(mapScriptEntry(scriptItem, idx, baseURL));
     });
 
     // let createdItems = script.items.map(i => mapScriptEntry(i, baseURL));
