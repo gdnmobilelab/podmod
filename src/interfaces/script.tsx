@@ -12,6 +12,7 @@ export interface ScriptMetadata {
     title: string;
     description: string;
     avatarFile: string;
+    length: number;
 }
 
 export interface Script {

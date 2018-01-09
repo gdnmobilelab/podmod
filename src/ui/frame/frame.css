@@ -26,4 +26,5 @@ body {
     background: #5e646c;
     flex-shrink: 0;
     padding: 3vw 1vw;
+    position: relative;
 }

@@ -8,6 +8,9 @@ import { Progress } from "../progress/progress";
 import { Controls } from "../controls/controls";
 import { Header } from "../header/header";
 import { Script, mapScriptEntries, makeRelative } from "../../interfaces/script";
+import { sendEvent } from "../../util/analytics";
+import { StartButton } from "../start-button/start-button";
+import { ProgressSlider } from "../progress-slider/progress-slider";
 
 enum PlayState {
     Paused,
@@ -76,7 +79,11 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
 
         let audio: JSX.Element | null = null;
 
+        let chapterMarks: number[] = [];
+
         if (this.state.script) {
+            duration = this.state.script.metadata.length;
+
             audio = (
                 <audio
                     src={this.state.script.audioFile}
@@ -90,6 +97,8 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                     ref={el => (this.audioElement = el as HTMLAudioElement)}
                 />
             );
+
+            chapterMarks = this.state.script.chapters.map(c => c.time);
         }
 
         return (
@@ -110,15 +119,21 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                         downloadPercentage={loadedPercent}
                         playbackPercentage={playbackPercent}
                     /> */}
-                    <Progress
+                    <ProgressSlider
+                        length={duration}
+                        currentPosition={currentPosition}
+                        chapters={chapterMarks}
+                        onSliderChange={newTime => this.setTime(newTime, false)}
+                    />
+                    {/* <Progress
                         duration={duration}
                         currentPosition={currentPosition}
                         onChange={i => this.setTime(i, false)}
                         currentChapterName={this.state.currentChapterName}
-                    />
+                    /> */}
                     <Controls
-                        onPlay={() => this.audioElement.play()}
-                        onPause={() => this.audioElement.pause()}
+                        onPlay={() => this.play()}
+                        onPause={() => this.pause()}
                         onRewind={() => this.setTime(-10, true)}
                         onFastForward={() => this.setTime(10, true)}
                         onSkipBack={() => this.moveChapter(-1)}
@@ -126,9 +141,27 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                         canPlay={this.state.playState == PlayState.Paused}
                         canPause={this.state.playState == PlayState.Playing}
                     />
+                    {/* <StartButton
+                        display={this.state.playback === undefined}
+                        onPlay={this.playWithAlertSetting.bind(this)}
+                    /> */}
                 </div>
             </div>
         );
+    }
+
+    playWithAlertSetting(showAlerts: boolean) {
+        this.play();
+    }
+
+    play() {
+        this.audioElement.play();
+        sendEvent("Web browser", "Play", "TO BE ADDED");
+    }
+
+    pause() {
+        this.audioElement.pause();
+        sendEvent("Web browser", "Pause");
     }
 
     moveChapter(byValue: number) {
@@ -171,6 +204,13 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
         } else {
             this.audioElement.currentTime = toValue;
         }
+
+        this.setState({
+            playback: {
+                total: this.audioElement.duration,
+                current: this.audioElement.currentTime
+            }
+        });
     }
 
     async componentDidMount() {
@@ -198,15 +238,12 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
         if ("mediaSession" in navigator) {
             let mediaSession = (navigator as any).mediaSession;
 
-            mediaSession.metadata = new MediaMetadata({
-                title: "Episode 1",
-                artist: "The Guardian",
-                album: "Untitled Mona Chalabi Podcast",
-                artwork: [{ src: "./bundles/mona-ep-1/pee_thumb.png", sizes: "325x333", type: "image/png" }]
+            mediaSession.setActionHandler("play", () => {
+                sendEvent("Lockscreen player", "Play", "TO BE ADDED");
             });
-
-            // mediaSession.setActionHandler("play", function() {});
-            // mediaSession.setActionHandler("pause", function() {});
+            mediaSession.setActionHandler("pause", () => {
+                sendEvent("Lockscreen player", "Pause");
+            });
             mediaSession.setActionHandler("seekbackward", () => {
                 this.setTime(-10, true);
             });
@@ -287,14 +324,17 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
 
     componentDidUpdate(oldProps, oldState: PlayerState) {
         if ("mediaSession" in navigator === false) {
+            // If we don't implement the MediaSession API then just ignore all this
             return;
         }
 
         if (!oldState.script || oldState.currentChapterName === this.state.currentChapterName) {
+            // If we already have a script and the chapter names haven't changed, we can ignore
             return;
         }
 
         if (!this.state.script) {
+            // Also, if we still don't have a script, we can still ignore
             return;
         }
 
