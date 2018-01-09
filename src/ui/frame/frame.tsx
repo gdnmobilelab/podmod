@@ -59,7 +59,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
 
         this.setState({
             script: json,
-            scriptElements: mapScriptEntries(json.items, absoluteURL)
+            scriptElements: mapScriptEntries(json, absoluteURL)
         });
     }
 

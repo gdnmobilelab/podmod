@@ -92,6 +92,32 @@ function mapScriptEntry(response: ChatBubbleProperties, baseURL: URL): JSX.Eleme
     return <BubbleGroup notification={notificationOptions}>{elements}</BubbleGroup>;
 }
 
-export function mapScriptEntries(items: ChatBubbleProperties[], baseURL: URL) {
-    return items.map(i => mapScriptEntry(i, baseURL));
+export function mapScriptEntries(script: Script, baseURL: URL) {
+    let items: JSX.Element[] = [];
+    let currentChapterIndex = 0;
+
+    script.items.forEach(scriptItem => {
+        let currentChapter = script.chapters[currentChapterIndex];
+        if (currentChapter && currentChapter.time < scriptItem.time) {
+            items.push(
+                <BubbleGroup>
+                    <ChatBubble chapterIndicator={currentChapter} time={currentChapter.time} />
+                </BubbleGroup>
+            );
+            currentChapterIndex++;
+        }
+        items.push(mapScriptEntry(scriptItem, baseURL));
+    });
+
+    // let createdItems = script.items.map(i => mapScriptEntry(i, baseURL));
+
+    // let chapterIndicators = script.chapters.map(c => {
+    //     return (
+    //         <BubbleGroup>
+    //             <ChatBubble chapterIndicator={c} time={c.time} />
+    //         </BubbleGroup>
+    //     );
+    // });
+
+    return items;
 }

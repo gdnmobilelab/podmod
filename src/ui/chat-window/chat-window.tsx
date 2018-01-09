@@ -38,6 +38,7 @@ export class ChatWindow extends React.Component<ChatWindowProps, any> {
     generateItem(indexes: number[]) {
         return Promise.resolve(
             indexes.map(idx => {
+                console.log("fetch for index", idx);
                 return this.props.elements![idx] || null;
                 // let properties = this.state.visibleItems[idx];
                 // if (!properties) {
@@ -76,6 +77,7 @@ export class ChatWindow extends React.Component<ChatWindowProps, any> {
 
             newVisibleItems = newVisibleItems.concat(chapterBubbles).sort((a, b) => a.time - b.time);
         }
+        console.log(newVisibleItems);
         this.setState({
             visibleItems: newVisibleItems
         });
