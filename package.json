@@ -42,11 +42,14 @@
         "html-webpack-plugin": "^2.30.1",
         "performance-scroll-view": "file:../performance-scroll-view",
         "photoswipe": "^4.1.2",
+        "pushkin-client": "file:../pushkin-client",
         "range-parser": "^1.2.0",
         "react": "^16.1.1",
         "react-dom": "^16.1.1",
         "react-photoswipe": "^1.3.0",
         "react-pointable": "^1.1.1",
-        "service-worker-command-bridge": "file:../sw-mini-libraries/service-worker-command-bridge"
+        "service-worker-command-bridge": "file:../sw-mini-libraries/service-worker-command-bridge",
+        "treo": "^0.5.1",
+        "treo-promise": "^1.0.3"
     }
 }

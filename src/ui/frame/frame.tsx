@@ -11,6 +11,7 @@ import { Script, mapScriptEntries, makeRelative } from "../../interfaces/script"
 import { sendEvent } from "../../util/analytics";
 import { StartButton } from "../start-button/start-button";
 import { ProgressSlider } from "../progress-slider/progress-slider";
+import { SideMenu } from "../side-menu/side-menu";
 
 enum PlayState {
     Paused,
@@ -146,6 +147,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                         onPlay={this.playWithAlertSetting.bind(this)}
                     /> */}
                 </div>
+                <SideMenu script={this.state.script} />
             </div>
         );
     }

@@ -5,6 +5,10 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 const webpack = require("webpack");
 
+let env = process.env.NODE_ENV === "production" ? "production" : "staging";
+
+let config = require(`./config/${env}.json`);
+
 module.exports = {
     entry: {
         worker: "./src/worker.ts",
@@ -59,6 +63,10 @@ module.exports = {
                 to: "bundles"
             }
         ]),
-        new ExtractTextPlugin("styles.css")
+        new ExtractTextPlugin("styles.css"),
+        new webpack.DefinePlugin({
+            PUSHKIN_HOST: JSON.stringify(config.PUSHKIN_HOST),
+            PUSHKIN_KEY: JSON.stringify(config.PUSHKIN_KEY)
+        })
     ]
 };

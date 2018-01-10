@@ -5,6 +5,14 @@ import { CacheSync } from "./io/cache-sync";
 import { CommandListener } from "service-worker-command-bridge";
 // import * as deepEqual from "deep-equal";
 import { CacheSyncRequest, CacheSyncResponse } from "./interfaces/cache-sync-request";
+import {
+    setConfig,
+    subscribeToTopic,
+    unsubscribeFromTopic,
+    getSubscribedTopics,
+    SubscribeOptions,
+    UnsubscribeOptions
+} from "pushkin-client";
 
 declare var self: ServiceWorkerGlobalScope;
 
@@ -94,12 +102,16 @@ self.addEventListener("notificationclick", async e => {
     (allClients[0] as WindowClient).focus();
 });
 
-// CommandListener.bind("remove-notification")
+setConfig({
+    key: PUSHKIN_KEY,
+    host: PUSHKIN_HOST
+});
 
-// CommandListener.listen();
+CommandListener.bind("get-subscribed-topics", getSubscribedTopics);
+CommandListener.bind("push-subscribe", (opts: SubscribeOptions) => {
+    return subscribeToTopic(opts);
+});
 
-// let sync = new CacheSync("test-cache", "./bundles/mona-ep-1/files.json");
-// sync.addEventListener("progress", e => {
-//     console.log(e.detail);
-// });
-// sync.complete.then(() => console.info("done"));
+CommandListener.bind("push-unsubscribe", (opts: UnsubscribeOptions) => {
+    return unsubscribeFromTopic(opts);
+});
