@@ -1,0 +1,37 @@
+.progress-slider {
+    width: 100%;
+    position: relative;
+    height: 10px;
+    background: red;
+}
+
+.current-position {
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    left: 0px;
+    background: yellow;
+    transition: transform 0.1s linear, opacity 0.1s linear;
+}
+
+.current-position-wrapper {
+    margin-left: -10px;
+    margin-top: -12px;
+    padding: 10px;
+    position: absolute;
+    border-radius: 50%;
+}
+
+.picked-up-wrapper .current-position {
+    transform: scale(1.5);
+    opacity: 0.5;
+}
+
+.chapter-mark {
+    height: 6px;
+    width: 6px;
+    margin-top: 2px;
+    border-radius: 50%;
+    background: #fff;
+    position: absolute;
+}
