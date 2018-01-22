@@ -10,6 +10,7 @@ interface PlayerControlProperties {
     onFastForward: () => void;
     onSkipBack: () => void;
     onSkipForward: () => void;
+    onBottomToggle: () => void;
 }
 
 export function Controls(props: PlayerControlProperties) {
@@ -25,6 +26,7 @@ export function Controls(props: PlayerControlProperties) {
             </button>
             <button onClick={props.onFastForward}>+ 10s</button>
             <button onClick={props.onSkipForward}>+ Chapter</button>
+            <button onClick={props.onBottomToggle}>More</button>
         </div>
     );
 }

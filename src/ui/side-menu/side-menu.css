@@ -2,13 +2,13 @@
     position: absolute;
     width: 100%;
     height: 100%;
-    touch-action: none;
+    pointer-events: none;
     transition: background 0.2s linear;
 }
 
 .opened-container {
     background: rgba(0, 0, 0, 0.5);
-    touch-action: auto;
+    pointer-events: auto;
 }
 
 .side-menu {
@@ -31,4 +31,5 @@
     right: 0;
     top: 0;
     display: block;
+    pointer-events: auto;
 }

@@ -12,6 +12,8 @@ import { sendEvent } from "../../util/analytics";
 import { StartButton } from "../start-button/start-button";
 import { ProgressSlider } from "../progress-slider/progress-slider";
 import { SideMenu } from "../side-menu/side-menu";
+import { BottomSlider } from "../bottom-slider/bottom-slider";
+import { BottomInfo } from "../bottom-info/bottom-info";
 
 enum PlayState {
     Paused,
@@ -32,6 +34,7 @@ interface PlayerState {
     script?: Script;
     scriptElements?: JSX.Element[];
     currentChapterName?: string;
+    bottomSliderExpanded: boolean;
 }
 
 interface PlayerProps {
@@ -44,7 +47,8 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
     constructor(props) {
         super(props);
         this.state = {
-            playState: PlayState.Paused
+            playState: PlayState.Paused,
+            bottomSliderExpanded: false
         };
         this.timeUpdate = this.timeUpdate.bind(this);
         this.playStateChange = this.playStateChange.bind(this);
@@ -114,24 +118,17 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                     currentTime={this.state.playback ? this.state.playback.current : 0}
                     elements={this.state.scriptElements}
                 />
-                <div className={styles.controls}>
-                    {/* <Waveform
-                        dataURL="/bundles/mona-ep-1/waveform.dat"
-                        downloadPercentage={loadedPercent}
-                        playbackPercentage={playbackPercent}
-                    /> */}
+                <BottomSlider
+                    className={styles.controls}
+                    bottomElement={<BottomInfo script={this.state.script} alertsEnabled={false} />}
+                    expanded={this.state.bottomSliderExpanded}
+                >
                     <ProgressSlider
                         length={duration}
                         currentPosition={currentPosition}
                         chapters={chapterMarks}
                         onSliderChange={newTime => this.setTime(newTime, false)}
                     />
-                    {/* <Progress
-                        duration={duration}
-                        currentPosition={currentPosition}
-                        onChange={i => this.setTime(i, false)}
-                        currentChapterName={this.state.currentChapterName}
-                    /> */}
                     <Controls
                         onPlay={() => this.play()}
                         onPause={() => this.pause()}
@@ -141,12 +138,12 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                         onSkipForward={() => this.moveChapter(1)}
                         canPlay={this.state.playState == PlayState.Paused}
                         canPause={this.state.playState == PlayState.Playing}
+                        onBottomToggle={() =>
+                            this.setState({ bottomSliderExpanded: !this.state.bottomSliderExpanded })
+                        }
                     />
-                    {/* <StartButton
-                        display={this.state.playback === undefined}
-                        onPlay={this.playWithAlertSetting.bind(this)}
-                    /> */}
-                </div>
+                    <StartButton display={true} onPlay={() => this.play()} />
+                </BottomSlider>
                 <SideMenu script={this.state.script} />
             </div>
         );

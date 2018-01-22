@@ -24,7 +24,7 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
     constructor(props) {
         super(props);
         this.state = {
-            opened: true,
+            opened: false,
             subscribed: SubscribeState.Unknown
         };
         this.setAndStopPropagation = this.setAndStopPropagation.bind(this);

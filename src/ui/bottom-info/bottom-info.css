@@ -1,0 +1,9 @@
+.bottom-info {
+    background: darkblue;
+    padding: 15px;
+    color: #fff;
+}
+
+.bottom-info h3 {
+    margin: 0;
+}

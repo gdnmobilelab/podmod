@@ -8,12 +8,15 @@ interface HeaderProperties {
 }
 
 export function Header(props: HeaderProperties) {
-    // Get rid of this until we have a design.
-    return null;
+    if (!props.metadata) {
+        return null;
+    }
 
-    // if (!props.metadata) {
-    //     return null;
-    // }
+    return (
+        <div className={styles.header}>
+            <h1>{props.metadata.title}</h1>
+        </div>
+    );
 
     // let imgUrl = makeRelative(props.metadata.avatarFile, props.relativeTo);
 
