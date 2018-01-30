@@ -25,7 +25,7 @@ module.exports = {
                 use: ["awesome-typescript-loader"]
             },
             {
-                test: /\.(gif|png|svg)?$/,
+                test: /\.(gif|png|svg|jpg)?$/,
                 use: ["file-loader"]
             },
             {

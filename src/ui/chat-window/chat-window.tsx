@@ -38,7 +38,6 @@ export class ChatWindow extends React.Component<ChatWindowProps, ChatWindowState
     generateItem(indexes: number[]) {
         return Promise.resolve(
             indexes.map(idx => {
-                console.log("fetch for index", idx);
                 return this.props.elements![idx] || null;
                 // let properties = this.state.visibleItems[idx];
                 // if (!properties) {
@@ -91,13 +90,14 @@ export class ChatWindow extends React.Component<ChatWindowProps, ChatWindowState
 
     render() {
         let innerView: JSX.Element | null = null;
+        let avatar: JSX.Element | null = null;
 
-        if (this.state.numberOfVisibleItems > 0) {
+        if (this.state.numberOfVisibleItems > 0 && this.props.script) {
             // We only create the view when we have items, that way we avoid the initial items
             // being animated into view.
             innerView = (
                 <PerformanceScrollView
-                    className={styles.chat}
+                    className={styles.chat + " chat-window"}
                     numberOfItems={this.state.numberOfVisibleItems}
                     itemBufferSize={20}
                     itemGenerator={this.generateItem}
@@ -107,7 +107,24 @@ export class ChatWindow extends React.Component<ChatWindowProps, ChatWindowState
                     startIndex={this.state.numberOfVisibleItems - 1}
                 />
             );
+
+            avatar = (
+                <div
+                    className={styles.avatar}
+                    style={{
+                        backgroundImage: `url(${this.props.script.baseURL +
+                            this.props.script.metadata.avatarFile})`
+                    }}
+                >
+                    <div className={styles.avatarInner} />
+                </div>
+            );
         }
-        return <div className={styles.chatContainer}>{innerView}</div>;
+        return (
+            <div className={styles.chatContainer}>
+                {innerView}
+                {avatar}
+            </div>
+        );
     }
 }

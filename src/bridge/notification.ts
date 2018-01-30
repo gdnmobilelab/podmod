@@ -7,3 +7,5 @@ export class NotificationBridge {
 }
 
 export const NotificationBridgeInstance = new NotificationBridge();
+
+export const NotificationsSupported = "Notification" in window && "serviceWorker" in navigator;

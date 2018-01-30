@@ -5,6 +5,7 @@ import { Script } from "../../interfaces/script";
 interface BottomInfoProps {
     script?: Script;
     alertsEnabled: boolean;
+    onAlertChange: (enabled: boolean) => void;
 }
 
 interface BottomInfoState {}
@@ -29,7 +30,19 @@ export class BottomInfo extends React.Component<BottomInfoProps, BottomInfoState
 
         let minutes = Math.round(this.props.script.metadata.length / 60);
 
-        let buttons: JSX.Element[] = [];
+        let checkboxClasses = styles.checkbox;
+        if (this.props.alertsEnabled) {
+            checkboxClasses += " " + styles.checkboxTicked;
+        }
+
+        let buttons: JSX.Element[] = [
+            <button
+                className={styles.withCheckbox}
+                onClick={() => this.props.onAlertChange(!this.props.alertsEnabled)}
+            >
+                <span className={checkboxClasses} />Show Alerts
+            </button>
+        ];
 
         if ("share" in navigator) {
             buttons.push(<button onClick={this.share}>Share</button>);
@@ -38,7 +51,8 @@ export class BottomInfo extends React.Component<BottomInfoProps, BottomInfoState
         return (
             <div className={styles.bottomInfo}>
                 <h3>{this.props.script.metadata.title}</h3>
-                <p>{minutes} mins</p>
+                <p className={styles.subtitle}>{minutes} mins</p>
+                <p className={styles.description}>{this.props.script.metadata.description}</p>
                 <div>{buttons}</div>
             </div>
         );

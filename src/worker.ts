@@ -56,6 +56,7 @@ self.addEventListener("install", e => self.skipWaiting());
 self.addEventListener("activate", e => self.clients.claim());
 
 CommandListener.bind("show-notification", (n: ShowNotification) => {
+    console.log("SHOW THIS?", n);
     self.registration.showNotification(n.title, {
         icon: n.icon,
         body: n.body,

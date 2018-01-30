@@ -8,7 +8,10 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    background: darkblue;
+    background: #fff;
+    /* total hack but it covers up the top of the slider control */
+    margin-top: -5px;
+    padding-top: 5px;
 }
 
 .hidden {
@@ -23,12 +26,13 @@
     border: none;
     padding: 10px 30px;
     background: transparent;
-    color: #fff;
+    color: #569396;
+    width: 90%;
     /* margin: 0 auto; */
 }
 
 .start-button-container button.highlighted-button {
-    background: white;
-    color: darkblue;
+    background: #f5b227;
+    color: #fff;
     border-radius: 20px;
 }

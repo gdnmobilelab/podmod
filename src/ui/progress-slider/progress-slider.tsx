@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as styles from "./progress-slider.css";
 import Pointable from "react-pointable";
+// import { MouseEvent } from "react";
 
 interface ProgressSliderProps {
     length: number;
@@ -16,23 +17,35 @@ interface ProgressSliderState {
     maximumX?: number;
 }
 
+function getXFromEvent(e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>) {}
+
 export class ProgressSlider extends React.Component<ProgressSliderProps, ProgressSliderState> {
     sliderElement: HTMLDivElement | null;
 
     constructor(props) {
         super(props);
         this.state = {};
-        this.updateMovePosition = this.updateMovePosition.bind(this);
+        this.updateMovePositionTouch = this.updateMovePositionTouch.bind(this);
+        this.updateMovePositionMouse = this.updateMovePositionMouse.bind(this);
         this.dropScrubber = this.dropScrubber.bind(this);
-        this.pickupScrubber = this.pickupScrubber.bind(this);
+        this.pickupScrubberTouch = this.pickupScrubberTouch.bind(this);
+        this.pickupScrubberMouse = this.pickupScrubberMouse.bind(this);
     }
 
-    updateMovePosition(e) {
+    updateMovePositionMouse(e: MouseEvent) {
+        this.updateMovePosition(e.clientX);
+    }
+
+    updateMovePositionTouch(e: TouchEvent) {
+        this.updateMovePosition(e.touches[0].clientX);
+    }
+
+    updateMovePosition(newX: number) {
         if (!this.state.pickupX || !this.state.maximumX) {
             throw new Error("Called move update without first calling pickup");
         }
 
-        let positionX = e.clientX - this.state.pickupX;
+        let positionX = newX - this.state.pickupX;
 
         // positionX = Math.max(positionX, 0);
         positionX = Math.min(positionX, this.state.maximumX);
@@ -71,7 +84,15 @@ export class ProgressSlider extends React.Component<ProgressSliderProps, Progres
         });
     }
 
-    pickupScrubber(e) {
+    pickupScrubberTouch(e: React.TouchEvent<HTMLDivElement>) {
+        this.pickupScrubber(e.touches[0].clientX);
+    }
+
+    pickupScrubberMouse(e: React.MouseEvent<HTMLDivElement>) {
+        this.pickupScrubber(e.clientX);
+    }
+
+    pickupScrubber(pickupX: number) {
         if (!this.sliderElement) {
             throw new Error(
                 "Could not process slider pickup because the container element doesn't exist yet"
@@ -82,7 +103,7 @@ export class ProgressSlider extends React.Component<ProgressSliderProps, Progres
 
         this.setState({
             pickupTime: this.props.currentPosition,
-            pickupX: e.clientX,
+            pickupX: pickupX,
             moveX: 0,
             maximumX: width
         });
@@ -91,12 +112,16 @@ export class ProgressSlider extends React.Component<ProgressSliderProps, Progres
     componentDidUpdate(oldProps, oldState: ProgressSliderState) {
         if (this.state.pickupTime !== undefined && oldState.pickupTime === undefined) {
             console.info("Setting pointer listener after picking up scrubber");
-            document.body.addEventListener("pointermove", this.updateMovePosition);
-            document.body.addEventListener("pointerup", this.dropScrubber);
+            document.body.addEventListener("mousemove", this.updateMovePositionMouse);
+            document.body.addEventListener("touchmove", this.updateMovePositionTouch);
+            document.body.addEventListener("mouseup", this.dropScrubber);
+            document.body.addEventListener("touchend", this.dropScrubber);
         } else if (this.state.pickupTime === undefined && oldState.pickupTime !== undefined) {
             console.info("Removing scrubber listener event");
-            document.body.removeEventListener("pointermove", this.updateMovePosition);
-            document.body.removeEventListener("pointerup", this.dropScrubber);
+            document.body.removeEventListener("mousemove", this.updateMovePositionMouse);
+            document.body.removeEventListener("touchmove", this.updateMovePositionTouch);
+            document.body.removeEventListener("mouseup", this.dropScrubber);
+            document.body.removeEventListener("touchend", this.dropScrubber);
         }
     }
 
@@ -107,7 +132,7 @@ export class ProgressSlider extends React.Component<ProgressSliderProps, Progres
 
         let currentPositionWrapperStyles = styles.currentPositionWrapper;
 
-        let containerStyles: any = { left: 0 };
+        let containerStyles: any = { left: 0, transform: `translateX(-6px)` };
 
         if (this.state.pickupTime !== undefined && this.state.maximumX) {
             // If we've picked it up, we don't want to move it relative to current position any more
@@ -115,15 +140,15 @@ export class ProgressSlider extends React.Component<ProgressSliderProps, Progres
             // be where the user picked it up, then use CSS transforms to move position according to
             // user drag.
 
-            currentPositionPercent = this.state.pickupTime / this.props.length;
+            let adjustedPositionPercent = this.state.pickupTime / this.props.length;
 
-            let positionX = currentPositionPercent * this.state.maximumX;
+            let positionX = adjustedPositionPercent * this.state.maximumX;
 
             currentPositionWrapperStyles += " " + styles.pickedUpWrapper;
             if (this.state.pickupX !== undefined && this.state.moveX !== undefined) {
                 positionX += this.state.moveX;
 
-                containerStyles.transform = `translateX(${positionX}px)`;
+                containerStyles.transform = `translateX(${positionX - 6}px)`;
             }
         } else {
             containerStyles.left = currentPositionPercent + "%";
@@ -131,6 +156,7 @@ export class ProgressSlider extends React.Component<ProgressSliderProps, Progres
 
         return (
             <div className={styles.progressSlider} ref={el => (this.sliderElement = el)}>
+                <div className={styles.soFarBar} style={{ width: currentPositionPercent + "%" }} />
                 {chapterPercents.map((percent, idx) => {
                     return (
                         <div
@@ -140,8 +166,8 @@ export class ProgressSlider extends React.Component<ProgressSliderProps, Progres
                         />
                     );
                 })}
-                <Pointable
-                    onPointerDown={this.pickupScrubber}
+                <div
+                    onTouchStart={this.pickupScrubberTouch}
                     // onPointerUp={() => {
                     //     this.setState({ pickupTime: undefined });
                     // }}
@@ -152,7 +178,7 @@ export class ProgressSlider extends React.Component<ProgressSliderProps, Progres
                     style={containerStyles}
                 >
                     <div className={styles.currentPosition} />
-                </Pointable>
+                </div>
             </div>
         );
     }

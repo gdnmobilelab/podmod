@@ -1,7 +1,7 @@
 import * as React from "react";
 import { ShowNotification } from "../../interfaces/notification";
-import { runServiceWorkerCommand } from "service-worker-command-bridge";
 import { makeRelative } from "../../interfaces/script";
+import { sendNotification, removeNotification } from "../../util/notification-dispatch";
 
 interface BubbleGroupProperties {
     notification?: ShowNotification;
@@ -46,17 +46,10 @@ export class BubbleGroup extends React.Component<BubbleGroupProperties, BubbleGr
             data
         });
 
-        runServiceWorkerCommand<ShowNotification, void>("show-notification", notificationOptions).catch(
-            err => {
-                console.error(err);
-            }
-        );
+        sendNotification(notificationOptions);
     }
 
     async componentWillUnmount() {
-        runServiceWorkerCommand<any, void>("remove-notification", {
-            uuid: this.state.uuid
-        });
-        // console.log(existing);
+        removeNotification(this.state.uuid);
     }
 }

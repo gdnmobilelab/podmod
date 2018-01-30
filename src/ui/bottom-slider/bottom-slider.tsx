@@ -27,7 +27,7 @@ export class BottomSlider extends React.Component<BottomSliderProps, BottomSlide
             transition: "transform 0.2s linear"
         };
 
-        if (this.props.expanded && this.state.bottomElementHeight) {
+        if (this.props.expanded && this.state && this.state.bottomElementHeight) {
             containerStyles.transform = `translate3d(0,${-this.state.bottomElementHeight}px,0)`;
         }
 
@@ -44,7 +44,7 @@ export class BottomSlider extends React.Component<BottomSliderProps, BottomSlide
     componentWillReceiveProps(nextProps: BottomSliderProps) {
         if (nextProps.expanded && this.props.expanded === false) {
             this.setState({
-                bottomElementHeight: this.bottomElementContainer!.getBoundingClientRect().height
+                bottomElementHeight: Math.round(this.bottomElementContainer!.getBoundingClientRect().height)
             });
         }
     }

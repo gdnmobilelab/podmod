@@ -14,19 +14,36 @@ interface PlayerControlProperties {
 }
 
 export function Controls(props: PlayerControlProperties) {
+    let playButtonAction: (() => void) | undefined = undefined;
+    let playButtonText = "Play";
+    let playButtonClass = styles.play;
+
+    if (props.canPlay) {
+        playButtonAction = props.onPlay;
+    } else if (props.canPause) {
+        playButtonAction = props.onPause;
+        playButtonText = "Pause";
+        playButtonClass = styles.pause;
+    }
+
     return (
         <div className={styles.controls}>
-            <button onClick={props.onSkipBack}>- Chapter</button>
-            <button onClick={props.onRewind}>- 10s</button>
-            <button onClick={props.onPlay} disabled={props.canPlay == false}>
-                Play
-            </button>
-            <button onClick={props.onPause} disabled={props.canPause == false}>
-                Pause
-            </button>
-            <button onClick={props.onFastForward}>+ 10s</button>
-            <button onClick={props.onSkipForward}>+ Chapter</button>
-            <button onClick={props.onBottomToggle}>More</button>
+            <div className={styles.controlsInner}>
+                {/* <button onClick={props.onSkipBack}>- Chapter</button> */}
+                <button className={styles.back15} onClick={props.onRewind}>
+                    - 10s
+                </button>
+                <button className={playButtonClass} onClick={playButtonAction}>
+                    Play
+                </button>
+                <button className={styles.forward15} onClick={props.onFastForward}>
+                    + 10s
+                </button>
+                {/* <button onClick={props.onSkipForward}>+ Chapter</button> */}
+                <button className={styles.more} onClick={props.onBottomToggle}>
+                    More
+                </button>
+            </div>
         </div>
     );
 }

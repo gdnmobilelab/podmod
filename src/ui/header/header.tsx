@@ -4,7 +4,7 @@ import * as React from "react";
 
 interface HeaderProperties {
     metadata?: ScriptMetadata;
-    relativeTo: string;
+    showExpanded: boolean;
 }
 
 export function Header(props: HeaderProperties) {
@@ -12,9 +12,20 @@ export function Header(props: HeaderProperties) {
         return null;
     }
 
+    let expandedClassName = styles.expandedHeader;
+    if (props.showExpanded) {
+        expandedClassName += " " + styles.showExpandedHeader;
+    }
+
     return (
         <div className={styles.header}>
-            <h1>{props.metadata.title}</h1>
+            <div className={expandedClassName}>
+                <div className={styles.strangeBirdTitle + " " + styles.expandedTitle}>
+                    {props.metadata.title}
+                </div>
+                <p>{props.metadata.description}</p>
+            </div>
+            <h1 className={styles.strangeBirdTitle}>{props.metadata.title}</h1>
         </div>
     );
 

@@ -48,18 +48,21 @@ function renderImage(bindTo: ChatBubble) {
     }
 
     let { width, height } = bindTo.props.images[0];
-    console.log("proportion", height, width, height / width * 100, bindTo.props.images[0]);
+
     let containerStyles: React.CSSProperties = {
         paddingTop: height / width * 100 + "%",
         width: "100%",
-        position: "relative"
+        position: "relative",
+        maxHeight: "60vh"
     };
 
     let imageStyles: React.CSSProperties = {
-        width: "100%",
+        maxWidth: "100%",
         top: 0,
-        left: 0,
-        position: "absolute"
+        left: "50%",
+        transform: "translateX(-50%)",
+        position: "absolute",
+        maxHeight: "60vh"
     };
 
     let gallery: JSX.Element | undefined = undefined;
@@ -77,13 +80,15 @@ function renderImage(bindTo: ChatBubble) {
     }
 
     return (
-        <div
-            style={containerStyles}
-            className={styles.bubbleImageContainer}
-            onClick={() => setExpandedState(bindTo, true)}
-        >
-            <img src={bindTo.props.images[0].url} style={imageStyles} />
-            {gallery}
+        <div style={{ maxHeight: "60vh" }}>
+            <div
+                style={containerStyles}
+                className={styles.bubbleImageContainer}
+                onClick={() => setExpandedState(bindTo, true)}
+            >
+                <img src={bindTo.props.images[0].url} style={imageStyles} />
+                {gallery}
+            </div>
         </div>
     );
 }
@@ -126,7 +131,12 @@ function renderChapterIndicator(chapter: Chapter | undefined) {
     if (!chapter) {
         return null;
     }
-    return <div>{chapter.name}</div>;
+    return (
+        <div>
+            <div className={styles.chapterIndicatorText}>{chapter.name}</div>
+            <div className={styles.chapterIndicatorLine} />
+        </div>
+    );
 }
 
 export class ChatBubble extends Component<ChatBubbleProperties, ChatBubbleState> {
@@ -173,8 +183,7 @@ export class ChatBubble extends Component<ChatBubbleProperties, ChatBubbleState>
         if (this.textElement && this.containerElement) {
             // If it's just a text bubble it doesn't automatically change width according to the size
             // of the text container. We have to manually force it to do so.
-
-            this.containerElement.style.width = this.textElement.getBoundingClientRect().width + 50 + "px";
+            // this.containerElement.style.width = this.textElement.getBoundingClientRect().width + "px";
         }
 
         // if (document.visibilityState === "visible") {

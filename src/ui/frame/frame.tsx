@@ -14,6 +14,12 @@ import { ProgressSlider } from "../progress-slider/progress-slider";
 import { SideMenu } from "../side-menu/side-menu";
 import { BottomSlider } from "../bottom-slider/bottom-slider";
 import { BottomInfo } from "../bottom-info/bottom-info";
+import { fontsLoaded } from "../../util/fonts";
+import { TimeFormatter } from "../time-formatter/time-formatter";
+import { NotificationRequestResult } from "../../interfaces/notification";
+import { setNotificationEnableState, getNotificationEnableState } from "../../util/notification-dispatch";
+
+declare var FontFaceSet: any;
 
 enum PlayState {
     Paused,
@@ -35,6 +41,7 @@ interface PlayerState {
     scriptElements?: JSX.Element[];
     currentChapterName?: string;
     bottomSliderExpanded: boolean;
+    showNotifications: boolean;
 }
 
 interface PlayerProps {
@@ -48,7 +55,8 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
         super(props);
         this.state = {
             playState: PlayState.Paused,
-            bottomSliderExpanded: false
+            bottomSliderExpanded: false,
+            showNotifications: false
         };
         this.timeUpdate = this.timeUpdate.bind(this);
         this.playStateChange = this.playStateChange.bind(this);
@@ -57,14 +65,21 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
 
     async loadData() {
         let absoluteURL = new URL(this.props.scriptURL, window.location.href);
-        let response = await fetch(absoluteURL.href);
-        let json = (await response.json()) as Script;
 
-        json.audioFile = makeRelative(json.audioFile, absoluteURL.href);
+        async function loadAndTransformData() {
+            let response = await fetch(absoluteURL.href);
+            let json = (await response.json()) as Script;
 
-        this.setState({
-            script: json,
-            scriptElements: mapScriptEntries(json, absoluteURL)
+            json.audioFile = makeRelative(json.audioFile, absoluteURL.href);
+            json.baseURL = new URL(".", absoluteURL.href).href;
+            return json;
+        }
+
+        Promise.all([loadAndTransformData(), fontsLoaded]).then(([json]) => {
+            this.setState({
+                script: json,
+                scriptElements: mapScriptEntries(json, absoluteURL)
+            });
         });
     }
 
@@ -106,12 +121,16 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
             chapterMarks = this.state.script.chapters.map(c => c.time);
         }
 
+        let isInitialView =
+            this.state.playback === undefined ||
+            (this.state.playState === PlayState.Paused && this.state.playback.current === 0);
+
         return (
             <div className={styles.frame}>
                 {audio}
                 <Header
                     metadata={this.state.script ? this.state.script.metadata : undefined}
-                    relativeTo={this.props.scriptURL}
+                    showExpanded={isInitialView}
                 />
                 <ChatWindow
                     script={this.state.script}
@@ -120,7 +139,13 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                 />
                 <BottomSlider
                     className={styles.controls}
-                    bottomElement={<BottomInfo script={this.state.script} alertsEnabled={false} />}
+                    bottomElement={
+                        <BottomInfo
+                            script={this.state.script}
+                            alertsEnabled={this.state.showNotifications}
+                            onAlertChange={newSetting => this.setNotificationSetting(newSetting)}
+                        />
+                    }
                     expanded={this.state.bottomSliderExpanded}
                 >
                     <ProgressSlider
@@ -129,6 +154,17 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                         chapters={chapterMarks}
                         onSliderChange={newTime => this.setTime(newTime, false)}
                     />
+                    <div className={styles.timeAndChapter}>
+                        <TimeFormatter
+                            time={this.state.playback ? this.state.playback.current : 0}
+                            className={styles.timeBlock}
+                        />
+                        <div className={styles.currentChapterName}>{this.state.currentChapterName}</div>
+                        <TimeFormatter
+                            time={this.state.playback ? this.state.playback.total : undefined}
+                            className={styles.timeBlock + " " + styles.timeLeft}
+                        />
+                    </div>
                     <Controls
                         onPlay={() => this.play()}
                         onPause={() => this.pause()}
@@ -142,20 +178,38 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                             this.setState({ bottomSliderExpanded: !this.state.bottomSliderExpanded })
                         }
                     />
-                    <StartButton display={true} onPlay={() => this.play()} />
+                    <StartButton
+                        display={isInitialView}
+                        onPlay={show => this.playWithNotificationSetting(show)}
+                        onNotificationPermissionChange={() => {}}
+                    />
                 </BottomSlider>
                 <SideMenu script={this.state.script} />
             </div>
         );
     }
 
-    playWithAlertSetting(showAlerts: boolean) {
+    setNotificationSetting(showNotifications: boolean) {
+        setNotificationEnableState(showNotifications);
+        this.setState({
+            showNotifications
+        });
+    }
+
+    playWithNotificationSetting(showNotifications: boolean) {
+        this.setNotificationSetting(showNotifications);
         this.play();
     }
 
     play() {
         this.audioElement.play();
         sendEvent("Web browser", "Play", "TO BE ADDED");
+        this.setState({
+            playback: {
+                current: 0,
+                total: -1
+            }
+        });
     }
 
     pause() {
@@ -239,9 +293,11 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
 
             mediaSession.setActionHandler("play", () => {
                 sendEvent("Lockscreen player", "Play", "TO BE ADDED");
+                this.play();
             });
             mediaSession.setActionHandler("pause", () => {
                 sendEvent("Lockscreen player", "Pause");
+                this.pause();
             });
             mediaSession.setActionHandler("seekbackward", () => {
                 this.setTime(-10, true);

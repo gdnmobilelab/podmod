@@ -1,19 +1,47 @@
 .bubble-container {
-    text-align: right;
-    margin-left: auto;
+    text-align: left;
+    margin-right: auto;
 }
 
 .bubble {
-    background: #f0f0f0;
+    background: #fff;
     display: inline-block;
     border-radius: 15px;
     margin: 10px;
     overflow: hidden;
+    border: solid 0.5px #bdc1cb;
+    transition: border-radius 0.2s linear;
+    font-family: "Guardian Sans Web";
+    margin-left: 45px;
+}
+
+:global(.chat-window) > div:nth-last-child(2) .bubble-container .bubble {
+    /* mess of global rule here, but it's the best I can do */
+    border-radius: 15px 15px 15px 0px;
 }
 
 .chapter-indicator {
     text-align: center;
-    margin: 10px 0;
+    font-family: "Guardian Sans Web";
+    color: #909498;
+    position: relative;
+    margin: 0 15px;
+}
+
+.chapter-indicator-text {
+    background: #fff;
+    padding: 0 10px;
+    /* margin: 0 auto; */
+    display: inline;
+}
+
+.chapter-indicator-line {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: #909498;
+    top: 50%;
+    z-index: -1;
 }
 
 .bubble-touch {

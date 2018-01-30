@@ -19,7 +19,7 @@ export interface Script {
     items: ChatBubbleProperties[];
     chapters: Chapter[];
     audioFile: string;
-
+    baseURL: string;
     metadata: ScriptMetadata;
 }
 
@@ -70,7 +70,7 @@ function mapScriptEntry(response: ChatBubbleProperties, index: number, baseURL: 
         title: "Mona from The Guardian",
         body: response.text,
         icon: makeRelative("./bundles/mona-ep-1/mona-headshot-round.png", window.location.href),
-        badge: "https://www.gdnmobilelab.com/uk-election-2017/images/gdn_badge.png"
+        badge: makeRelative("./bundles/mona-ep-1/gdn_badge.png", window.location.href)
     };
 
     if (response.link) {
@@ -102,7 +102,7 @@ export function mapScriptEntries(script: Script, baseURL: URL) {
 
     script.items.forEach((scriptItem, idx) => {
         let currentChapter = script.chapters[currentChapterIndex];
-        if (currentChapter && currentChapter.time < scriptItem.time) {
+        if (currentChapter && currentChapter.time <= scriptItem.time) {
             items.push(
                 <BubbleGroup key={"chapter_" + currentChapterIndex}>
                     <ChatBubble chapterIndicator={currentChapter} time={currentChapter.time} />

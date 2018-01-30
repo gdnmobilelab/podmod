@@ -1,5 +1,5 @@
 .chat {
-    background: #d1d7dc;
+    background: #fff;
     flex-grow: 1;
     overflow: auto;
     /* display: flex; */
@@ -61,4 +61,23 @@
     padding: 3vw 4vw;
     line-height: 14px;
     border-radius: 3vw;
+}
+
+.avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    position: absolute;
+    bottom: 5px;
+    left: 10px;
+    background-size: cover;
+    overflow: hidden;
+}
+
+.avatar-inner {
+    width: 100%;
+    height: 100%;
+    background: #35a6ab;
+    opacity: 0.6;
+    border-radius: 50%;
 }

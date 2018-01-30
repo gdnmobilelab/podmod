@@ -12,3 +12,5 @@ export interface NotificationAction {
     title: string;
     action: string;
 }
+
+export type NotificationRequestResult = "granted" | "default" | "denied";
