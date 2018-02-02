@@ -1,0 +1,69 @@
+@keyframes back-fade {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.contact-box-back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 4;
+    animation-name: back-fade;
+    animation-duration: 0.2s;
+}
+
+.contact-box {
+    background: #fff;
+    width: 80vw;
+    position: absolute;
+    top: 50%;
+    left: 10vw;
+    padding: 20px;
+    box-sizing: border-box;
+    transform: translateY(-50%);
+    z-index: 5;
+}
+
+.contact-box h3 {
+    font-family: "Guardian Text Egyptian Web";
+    margin: 0;
+    margin: 1em 0;
+}
+
+.contact-box p {
+    font-family: "Guardian Sans Web";
+    line-height: 1.3em;
+    margin: 1.5em 0;
+}
+
+.contact-box ul,
+.contact-box li {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.contact-box a {
+    border-radius: 15px;
+    margin: 0;
+    padding: 10px 15px;
+    font-family: "Guardian Text Egyptian Web";
+    font-size: 14px;
+    font-weight: bold;
+    background: #f5b227;
+    color: #fff;
+    border: none;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    text-decoration: none;
+    text-align: center;
+    margin: 10px 0;
+}

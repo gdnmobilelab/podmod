@@ -2,8 +2,8 @@ import "photoswipe/dist/photoswipe.css";
 import "photoswipe/dist/default-skin/default-skin.css";
 import GalleryTemplate from "./html-template";
 import * as React from "react";
-import * as PhotoSwipeLib from "photoswipe";
-import * as PhotoSwipeUI_Default from "photoswipe/dist/photoswipe-ui-default";
+import * as PhotoSwipeLib from "photoswipe/dist/photoswipe.min";
+import * as PhotoSwipeUI_Default from "photoswipe/dist/photoswipe-ui-default.min";
 
 let container: Element | undefined = undefined;
 

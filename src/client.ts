@@ -25,4 +25,11 @@ render(
 
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("worker.js");
+
+    navigator.serviceWorker.onmessage = (e: ServiceWorkerMessageEvent) => {
+        console.info("Received message from service worker:", e.data);
+        if (e.data.command === "reload-if" && e.data.buildTime !== BUILD_TIME) {
+            window.location.reload();
+        }
+    };
 }

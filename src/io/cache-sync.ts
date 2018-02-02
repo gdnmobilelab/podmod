@@ -3,7 +3,7 @@ import { DownloadProgress, DownloadProgressEvent, DownloadProgressData } from ".
 import * as parseRange from "range-parser";
 import { EventTarget } from "event-target-shim";
 
-interface FileDetails {
+export interface FileDetails {
     url: string;
     downloaded: number;
     total: number;
@@ -16,6 +16,10 @@ export class CacheSync extends EventTarget {
     get complete() {
         return this.completePromise.promise;
     }
+
+    // addEventListener(eventName: "progress", listener: (details: DownloadProgressData) => void) {
+
+    // }
 
     private static currentlyDownloadingResponses = new Map<Response, number>();
 
@@ -51,39 +55,30 @@ export class CacheSync extends EventTarget {
         return undefined;
     }
 
-    constructor(cacheName: string, payloadURL: string) {
+    constructor(cacheName: string, urls: string[]) {
         super();
 
-        let payload = new URL(payloadURL, self.location.href);
+        this.start(cacheName, urls);
+    }
 
-        Promise.all([
-            caches.open(cacheName),
-            fetch(payloadURL).then(res => {
-                // Payload files are always arrays of strings, so we can make this
-                // promise more specific than it would have been otherwise.
+    async start(cacheName: string, urls: string[]) {
+        try {
+            let cache = await caches.open(cacheName);
 
-                return res.json() as Promise<string[]>;
-            })
-        ])
-            .then(([cache, fileList]) => {
-                this.files = fileList.map(file => {
-                    return {
-                        url: new URL(file, payload.href).href,
-                        downloaded: 0,
-                        total: -1
-                    };
-                });
-
-                let promises = this.files.map(file => this.performCacheCheck(cache, file));
-                return Promise.all(promises);
-            })
-            .then(() => {
-                this.completePromise.fulfill();
-            })
-            .catch(err => {
-                console.error(err);
-                this.completePromise.reject(err);
+            this.files = urls.map(file => {
+                return {
+                    url: file,
+                    downloaded: 0,
+                    total: -1
+                };
             });
+
+            let promises = this.files.map(file => this.performCacheCheck(cache, file));
+            await Promise.all(promises);
+            this.completePromise.fulfill();
+        } catch (err) {
+            this.completePromise.reject(err);
+        }
     }
 
     performCacheCheck(cache: Cache, fileEntry: FileDetails) {
@@ -154,15 +149,14 @@ export class CacheSync extends EventTarget {
 
         console.info(`Putting ${fileEntry.url} into the cache.`);
 
-        return Promise.all([
-            targetCache.put(incomingResponse.url, incomingResponse),
-            progress.complete
-        ]).then(() => {
-            // Now that the response is successfully inserted into the cache, we don't
-            // need our temporary store any more.
-            CacheSync.currentlyDownloadingResponses.delete(cloneForResponse);
-            console.info(`Successfully put ${fileEntry.url} into the cache.`);
-        });
+        return Promise.all([targetCache.put(incomingResponse.url, incomingResponse), progress.complete]).then(
+            () => {
+                // Now that the response is successfully inserted into the cache, we don't
+                // need our temporary store any more.
+                CacheSync.currentlyDownloadingResponses.delete(cloneForResponse);
+                console.info(`Successfully put ${fileEntry.url} into the cache.`);
+            }
+        );
     }
 
     emitProgressUpdate() {

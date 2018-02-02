@@ -5,7 +5,7 @@
     "main": "index.js",
     "scripts": {
         "dev": "webpack-dev-server",
-        "build": "webpack",
+        "build": "NODE_ENV=production webpack",
         "deploy-staging": "npm run build && aws s3 cp --recursive ./dist/ s3://www.stg.gdnmobilelab.com/podcast-test --acl \"public-read\" --cache-control=\"no-cache\""
     },
     "author": "",
@@ -27,6 +27,7 @@
         "ts-loader": "^3.0.2",
         "typescript": "^2.5.3",
         "typings-for-css-modules-loader": "^1.7.0",
+        "uglifyjs-webpack-plugin": "^1.1.8",
         "waveform-node": "^0.3.1",
         "webpack": "^3.7.1",
         "webpack-dev-server": "^2.9.2"

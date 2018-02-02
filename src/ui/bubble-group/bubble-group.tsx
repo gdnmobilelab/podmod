@@ -2,9 +2,11 @@ import * as React from "react";
 import { ShowNotification } from "../../interfaces/notification";
 import { makeRelative } from "../../interfaces/script";
 import { sendNotification, removeNotification } from "../../util/notification-dispatch";
+import { activeDing } from "../ding/ding";
 
 interface BubbleGroupProperties {
     notification?: ShowNotification;
+    silent: boolean;
 }
 
 interface BubbleGroupState {
@@ -33,6 +35,10 @@ export class BubbleGroup extends React.Component<BubbleGroupProperties, BubbleGr
     }
 
     componentDidMount() {
+        if (this.props.silent === false) {
+            activeDing!.ding();
+        }
+
         if (document.visibilityState === "visible" || !this.props.notification) {
             // If the user is currently on the page we don't show these notifications
             return;

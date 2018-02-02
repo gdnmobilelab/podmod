@@ -13,6 +13,7 @@ export interface ScriptMetadata {
     description: string;
     avatarFile: string;
     length: number;
+    episodeName: string;
 }
 
 export interface Script {
@@ -21,6 +22,10 @@ export interface Script {
     audioFile: string;
     baseURL: string;
     metadata: ScriptMetadata;
+    podcastId: string;
+    episodeId: string;
+    assets: string[];
+    dingFile: string;
 }
 
 export function makeRelative(url: string, baseURL: string) {
@@ -90,7 +95,11 @@ function mapScriptEntry(response: ChatBubbleProperties, index: number, baseURL: 
     }
 
     return (
-        <BubbleGroup notification={notificationOptions} key={"item_" + index}>
+        <BubbleGroup
+            notification={notificationOptions}
+            key={"item_" + index}
+            silent={response.silent || false}
+        >
             {elements}
         </BubbleGroup>
     );
@@ -104,7 +113,7 @@ export function mapScriptEntries(script: Script, baseURL: URL) {
         let currentChapter = script.chapters[currentChapterIndex];
         if (currentChapter && currentChapter.time <= scriptItem.time) {
             items.push(
-                <BubbleGroup key={"chapter_" + currentChapterIndex}>
+                <BubbleGroup key={"chapter_" + currentChapterIndex} silent={true}>
                     <ChatBubble chapterIndicator={currentChapter} time={currentChapter.time} />
                 </BubbleGroup>
             );

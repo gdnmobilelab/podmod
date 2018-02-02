@@ -13,6 +13,7 @@ import { StartButton } from "../start-button/start-button";
 import { ProgressSlider } from "../progress-slider/progress-slider";
 import { SideMenu } from "../side-menu/side-menu";
 import { BottomSlider } from "../bottom-slider/bottom-slider";
+import { Ding } from "../ding/ding";
 import { BottomInfo } from "../bottom-info/bottom-info";
 import { fontsLoaded } from "../../util/fonts";
 import { TimeFormatter } from "../time-formatter/time-formatter";
@@ -42,6 +43,7 @@ interface PlayerState {
     currentChapterName?: string;
     bottomSliderExpanded: boolean;
     showNotifications: boolean;
+    downloadOffline: boolean;
 }
 
 interface PlayerProps {
@@ -56,7 +58,8 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
         this.state = {
             playState: PlayState.Paused,
             bottomSliderExpanded: false,
-            showNotifications: false
+            showNotifications: false,
+            downloadOffline: false
         };
         this.timeUpdate = this.timeUpdate.bind(this);
         this.playStateChange = this.playStateChange.bind(this);
@@ -72,13 +75,22 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
 
             json.audioFile = makeRelative(json.audioFile, absoluteURL.href);
             json.baseURL = new URL(".", absoluteURL.href).href;
+            json.assets = json.assets.map(url => makeRelative(url, absoluteURL.href));
+            json.dingFile = makeRelative(json.dingFile, absoluteURL.href);
             return json;
         }
 
-        Promise.all([loadAndTransformData(), fontsLoaded]).then(([json]) => {
+        Promise.all([loadAndTransformData(), fontsLoaded]).then(async ([json]) => {
+            let cacheName = json.podcastId + "_" + json.episodeId;
+
+            // If the cache already exists then we know we've at least attempted
+            // to cache the podcast before now.
+            let hasCacheAlready = await caches.has(cacheName);
+
             this.setState({
                 script: json,
-                scriptElements: mapScriptEntries(json, absoluteURL)
+                scriptElements: mapScriptEntries(json, absoluteURL),
+                downloadOffline: hasCacheAlready
             });
         });
     }
@@ -98,6 +110,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
         }
 
         let audio: JSX.Element | null = null;
+        let dingElement: JSX.Element | null = null;
 
         let chapterMarks: number[] = [];
 
@@ -118,6 +131,10 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                 />
             );
 
+            dingElement = (
+                <Ding audioURL={this.state.script.dingFile} getMainAudioElement={() => this.audioElement} />
+            );
+
             chapterMarks = this.state.script.chapters.map(c => c.time);
         }
 
@@ -128,6 +145,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
         return (
             <div className={styles.frame}>
                 {audio}
+                {dingElement}
                 <Header
                     metadata={this.state.script ? this.state.script.metadata : undefined}
                     showExpanded={isInitialView}
@@ -141,6 +159,8 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                     className={styles.controls}
                     bottomElement={
                         <BottomInfo
+                            offlineDownloadEnabled={this.state.downloadOffline}
+                            offlineDownloadChange={newValue => this.setState({ downloadOffline: newValue })}
                             script={this.state.script}
                             alertsEnabled={this.state.showNotifications}
                             onAlertChange={newSetting => this.setNotificationSetting(newSetting)}
@@ -202,19 +222,26 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
     }
 
     play() {
+        this.nextSecondTimeout = undefined;
         this.audioElement.play();
         sendEvent("Web browser", "Play", "TO BE ADDED");
-        this.setState({
-            playback: {
-                current: 0,
-                total: -1
-            }
-        });
+        if (!this.state.playback) {
+            this.setState({
+                playback: {
+                    current: 0,
+                    total: -1
+                }
+            });
+        }
     }
 
     pause() {
         this.audioElement.pause();
         sendEvent("Web browser", "Pause");
+        if (this.nextSecondTimeout) {
+            clearTimeout(this.nextSecondTimeout);
+        }
+        this.nextSecondTimeout = undefined;
     }
 
     moveChapter(byValue: number) {
@@ -314,15 +341,18 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
         }
     }
 
-    nextSecondTimeout: number;
+    nextSecondTimeout: number | undefined;
 
     timeUpdate(e: React.SyntheticEvent<HTMLAudioElement>) {
         let currentTime = this.audioElement.currentTime;
         let nextSecond = Math.ceil(currentTime);
         let untilNextSecond = nextSecond - currentTime;
 
-        clearTimeout(this.nextSecondTimeout);
+        if (this.nextSecondTimeout) {
+            return;
+        }
         this.nextSecondTimeout = setTimeout(() => {
+            this.nextSecondTimeout = undefined;
             let chapterName: string | undefined = undefined;
             if (this.state.script && this.state.script.chapters) {
                 for (let i = 0; i < this.state.script.chapters.length; i++) {
@@ -335,7 +365,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
 
             this.setState({
                 playback: {
-                    current: this.audioElement.currentTime,
+                    current: nextSecond,
                     total: this.audioElement.duration
                 },
                 currentChapterName: chapterName
@@ -344,7 +374,6 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
     }
 
     audioProgress(e) {
-        console.log(e.target.buffered);
         if (e.target.buffered.length == 0) {
             return;
         }
@@ -370,10 +399,8 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
             playState: this.audioElement.paused ? PlayState.Paused : PlayState.Playing
         });
 
-        if (this.audioElement.paused) {
+        if (this.audioElement.paused && this.nextSecondTimeout) {
             clearTimeout(this.nextSecondTimeout);
-        } else if ("requestPermission" in Notification) {
-            Notification.requestPermission();
         }
     }
 

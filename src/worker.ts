@@ -16,35 +16,78 @@ import {
 
 declare var self: ServiceWorkerGlobalScope;
 
+async function checkCache() {
+    let hasCache = await caches.has("podmod-shell");
+
+    if (hasCache) {
+        console.info("Removing existing cache of podcast shell.");
+        await caches.delete("podmod-shell");
+    }
+
+    // cache the files we need to serve this page offline
+    if (ENVIRONMENT !== "production") {
+        console.warn("Not caching worker assets because we are in dev mode");
+    } else {
+        console.info("Adding cache of podcast shell.");
+        let newCache = await caches.open("podmod-shell");
+        await newCache.addAll(["styles.css", "./", "client.js"]);
+    }
+}
+
+async function clientClaim() {
+    await self.clients.claim();
+    let clients = await self.clients.matchAll();
+
+    clients.forEach(c =>
+        c.postMessage({
+            command: "reload-if",
+            buildTime: BUILD_TIME
+        })
+    );
+}
+
+self.addEventListener("install", e => {
+    e.waitUntil(checkCache());
+});
+
+self.addEventListener("activate", e => {
+    e.waitUntil(clientClaim());
+});
+
 self.addEventListener("fetch", (e: FetchEvent) => {
     e.respondWith(
-        caches
-            .match(e.request)
-            .then(response => {
-                console.log("cache response", response);
-                return response || CacheSync.matchInProgress(e.request);
-            })
-            .then(response => {
-                return response || fetch(e.request);
-            })
+        (async function() {
+            let cachedVersion = await caches.match(e.request);
+            if (cachedVersion) {
+                return cachedVersion;
+            }
+
+            let inProgressVersion = await CacheSync.matchInProgress(e.request);
+
+            if (inProgressVersion) {
+                return inProgressVersion;
+            }
+            console.info("Going over the wire to fetch", e.request.url);
+            return fetch(e.request);
+        })()
     );
 });
 
-CommandListener.bind("cachesync", (request: CacheSyncRequest) => {
-    let sync = new CacheSync(request.cacheName, request.payloadURL);
-    let channel = new MessageChannel();
+// CommandListener.bind("cachesync", (request: CacheSyncRequest) => {
+//     let sync = new CacheSync(request.cacheName, request.payloadURL);
+//     let channel = new MessageChannel();
 
-    sync.addEventListener("progress", e => {
-        channel.port1.postMessage(
-            Object.assign(e.detail, {
-                type: "progress"
-            })
-        );
-    });
-    return {
-        progressEvents: channel.port2
-    } as CacheSyncResponse;
-});
+//     sync.addEventListener("progress", e => {
+//         channel.port1.postMessage(
+//             Object.assign(e.detail, {
+//                 type: "progress"
+//             })
+//         );
+//     });
+//     return {
+//         progressEvents: channel.port2
+//     } as CacheSyncResponse;
+// });
 
 CommandListener.listen();
 

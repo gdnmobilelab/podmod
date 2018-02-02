@@ -29,6 +29,7 @@ export interface ChatBubbleProperties {
     images?: ChatBubbleImage[];
     link?: ChatBubbleLink;
     chapterIndicator?: Chapter;
+    silent?: boolean;
 }
 
 interface ChatBubbleState {

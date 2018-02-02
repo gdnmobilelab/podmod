@@ -4,10 +4,11 @@
     height: 100%;
     pointer-events: none;
     transition: background 0.2s linear;
+    z-index: 10;
 }
 
 .opened-container {
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.7);
     pointer-events: auto;
 }
 
@@ -15,11 +16,34 @@
     position: absolute;
     height: 100%;
     width: 80vw;
-    background: green;
+    background: #f5f2f0;
     right: 0;
     top: 0;
     transform: translate3d(100%, 0, 0);
     transition: transform 0.2s linear;
+    z-index: 3;
+    font-family: "Guardian Text Egyptian Web";
+    box-sizing: border-box;
+}
+
+.scroller {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.top-wing {
+    background-image: url("../../../bundles/mona-ep-1/side-menu-wing.jpg");
+    background-repeat: no-repeat;
+    background-size: auto 100%;
+    width: 100%;
+    height: 60px;
+    margin-top: -20px;
+    margin-left: -20px;
+    margin-bottom: 20px;
 }
 
 .opened-container .side-menu {
@@ -28,9 +52,93 @@
 
 .opener-button {
     position: absolute;
-    right: 0;
-    top: 0;
+    right: 10px;
+    top: 10px;
     display: block;
     pointer-events: auto;
     z-index: 3;
+    background: transparent;
+    background-image: url('data:image/svg+xml;utf8,<svg width="70" height="48" viewBox="0 0 70 48" xmlns="http://www.w3.org/2000/svg"><title>menu-button</title><g fill="#F7B300" fill-rule="evenodd"><path d="M0 0h72v8H0zM0 20h72v8H0zM0 40h72v8H0z"/></g></svg>');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    border: none;
+    width: 25px;
+    height: 25px;
+    font-size: 1px;
+    overflow: hidden;
+    text-indent: -1000px;
+}
+
+.strangebird-header {
+    background: url("../../../bundles/mona-ep-1/strange_bird_header.svg");
+    background-repeat: no-repeat;
+    background-size: auto 100%;
+    color: transparent;
+    font-size: 40px;
+    margin: 0;
+}
+
+.closer-button {
+    background-image: url('data:image/svg+xml;utf8,<svg width="55" height="53" viewBox="0 0 55 53" xmlns="http://www.w3.org/2000/svg"><title>close-button</title><g stroke="#F5B227" stroke-width="4" fill="none" fill-rule="evenodd" stroke-linecap="round"><path d="M50 4L4.9 49.1M4 4l45.1 45.1"/></g></svg>');
+}
+
+.side-menu h4 {
+    font-weight: bold;
+    margin: 0;
+    margin: 20px 0 10px;
+}
+
+.side-menu p {
+    font-size: 13px;
+    line-height: 1.3em;
+}
+
+.episode-list {
+    margin: 0;
+    padding: 0;
+}
+
+.episode-entry {
+    list-style: none;
+    background: #fff;
+    border-radius: 15px;
+    margin: 0;
+    padding: 10px 15px;
+    font-family: "Guardian Sans Web";
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    margin-bottom: 5px;
+    background-image: url('data:image/svg+xml;utf8,<svg width="23" height="45" viewBox="0 0 23 45" xmlns="http://www.w3.org/2000/svg"><title>right-arrow</title><path d="M3 41.353l16.74-19.176L3 3" stroke-width="4" stroke="#F5B227" fill="none" fill-rule="evenodd" stroke-linecap="round"/></svg>');
+    background-size: auto 60%;
+    background-position: 96% center;
+    background-repeat: no-repeat;
+    padding-right: 10%;
+}
+
+.episode-entry span {
+    display: block;
+}
+
+.episode-name {
+}
+
+.episode-status {
+    color: #767676;
+    flex-grow: 1;
+    text-align: right;
+}
+
+.subscribe-button {
+    border-radius: 15px;
+    margin: 0;
+    padding: 10px 15px;
+    font-family: "Guardian Text Egyptian Web";
+    font-size: 14px;
+    font-weight: bold;
+    background: #f5b227;
+    color: #fff;
+    border: none;
+    display: block;
+    width: 100%;
 }

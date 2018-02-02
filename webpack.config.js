@@ -2,6 +2,7 @@ const path = require("path");
 const HTMLWebpackPlugin = require("html-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
 
 const webpack = require("webpack");
 
@@ -18,6 +19,7 @@ module.exports = {
         filename: "[name].js",
         path: path.resolve(__dirname, "dist")
     },
+    // node: false,
     module: {
         rules: [
             {
@@ -66,7 +68,14 @@ module.exports = {
         new ExtractTextPlugin("styles.css"),
         new webpack.DefinePlugin({
             PUSHKIN_HOST: JSON.stringify(config.PUSHKIN_HOST),
-            PUSHKIN_KEY: JSON.stringify(config.PUSHKIN_KEY)
+            PUSHKIN_KEY: JSON.stringify(config.PUSHKIN_KEY),
+            ENVIRONMENT: JSON.stringify(env),
+            "process.env.NODE_ENV": JSON.stringify(env),
+            BUILD_TIME: JSON.stringify(Date.now())
         })
     ]
 };
+
+if (env === "production") {
+    module.exports.plugins.push(new UglifyJSPlugin());
+}
