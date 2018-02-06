@@ -77,8 +77,8 @@ export class Ding extends React.Component<DingProps, any> {
     componentDidMount() {
         // We need to get this to play in reaction to a touch event, so that we're
         // able to freely play it later. So we set up this touch handler.
-
-        document.addEventListener("touchstart", this.activateAudioElement);
+        console.info("DING: adding touchstart listener");
+        document.addEventListener("touchend", this.activateAudioElement);
         if (activeDing) {
             throw new Error("Can only have one active ding element!");
         }
@@ -86,7 +86,7 @@ export class Ding extends React.Component<DingProps, any> {
     }
 
     componentWillUnmount() {
-        document.removeEventListener("touchstart", this.activateAudioElement);
+        document.removeEventListener("touchend", this.activateAudioElement);
     }
 
     async activateAudioElement() {

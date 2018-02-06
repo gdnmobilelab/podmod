@@ -19,6 +19,7 @@ interface PhotoSwipeImage {
     src: string;
     w: number;
     h: number;
+    title: string;
 }
 
 interface PhotoSwipeProperties {

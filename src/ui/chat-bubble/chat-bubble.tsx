@@ -73,7 +73,8 @@ function renderImage(bindTo: ChatBubble) {
             return {
                 src: image.url,
                 w: image.width,
-                h: image.height
+                h: image.height,
+                title: bindTo.props.text || ""
             };
         });
 

@@ -20,7 +20,7 @@ async function requestPermission(onChange: (newPermission: NotificationRequestRe
 export function StartButton(props: StartButtonProps) {
     let className = styles.startButtonContainer;
 
-    if (props.display === false) {
+    if (props.display === false || 1 == 1) {
         className += " " + styles.hidden;
     }
 

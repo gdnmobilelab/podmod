@@ -85,7 +85,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
 
             // If the cache already exists then we know we've at least attempted
             // to cache the podcast before now.
-            let hasCacheAlready = await caches.has(cacheName);
+            let hasCacheAlready = "caches" in self && (await caches.has(cacheName));
 
             this.setState({
                 script: json,
