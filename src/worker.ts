@@ -47,7 +47,7 @@ async function clientClaim() {
 }
 
 self.addEventListener("install", e => {
-    e.waitUntil(checkCache());
+    e.waitUntil(Promise.all([checkCache(), self.skipWaiting()]));
 });
 
 self.addEventListener("activate", e => {

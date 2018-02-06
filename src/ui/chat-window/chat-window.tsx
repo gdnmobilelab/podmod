@@ -88,6 +88,8 @@ export class ChatWindow extends React.Component<ChatWindowProps, ChatWindowState
         // });
     }
 
+    scrollView: PerformanceScrollView | null;
+
     render() {
         let innerView: JSX.Element | null = null;
         let avatar: JSX.Element | null = null;
@@ -105,6 +107,7 @@ export class ChatWindow extends React.Component<ChatWindowProps, ChatWindowState
                     animationEaseFunction={easeOutBack}
                     animationDuration={750}
                     startIndex={this.state.numberOfVisibleItems - 1}
+                    ref={el => (this.scrollView = el)}
                 />
             );
 
@@ -126,5 +129,10 @@ export class ChatWindow extends React.Component<ChatWindowProps, ChatWindowState
                 {avatar}
             </div>
         );
+    }
+
+    componentDidUpdate() {
+        console.log("scr", this.scrollView);
+        (window as any).SCROLLTEST = this.scrollView;
     }
 }
