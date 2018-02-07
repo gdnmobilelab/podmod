@@ -22,8 +22,13 @@ interface PhotoSwipeImage {
     title: string;
 }
 
+interface PhotoSwipeCustomHTML {
+    html: string;
+    title: string;
+}
+
 interface PhotoSwipeProperties {
-    items: PhotoSwipeImage[];
+    items: (PhotoSwipeImage | PhotoSwipeCustomHTML)[];
     onClose?: () => void;
 }
 
@@ -52,6 +57,12 @@ export class PhotoSwipe extends React.Component<PhotoSwipeProperties, PhotoSwipe
         gallery.init();
 
         gallery.listen("destroy", this.galleryDestroyed);
+
+        // Links in captions seem to do weird things. We need to catch the event.
+
+        Array.from(el.querySelectorAll(".pswp__caption a")).forEach(el => {
+            el.addEventListener("touchstart", e => e.stopPropagation());
+        });
 
         this.setState({
             galleryContainer: el,

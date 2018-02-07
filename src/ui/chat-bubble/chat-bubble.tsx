@@ -14,6 +14,8 @@ export interface ChatBubbleImage {
     url: string;
     width: number;
     height: number;
+    caption: string;
+    video?: boolean;
 }
 
 export interface ChatBubbleLink {
@@ -62,23 +64,49 @@ function renderImage(bindTo: ChatBubble) {
         top: 0,
         left: "50%",
         transform: "translateX(-50%)",
-        position: "absolute",
-        maxHeight: "60vh"
+        position: "absolute"
+        // maxHeight: "60vh"
     };
 
     let gallery: JSX.Element | undefined = undefined;
 
     if (bindTo.state && bindTo.state.expanded === true) {
         var items = bindTo.props.images.map(image => {
+            if (image.video === true) {
+                return {
+                    html: `<video src="${image.url}" class="${
+                        styles.expandedVideo
+                    }" playsinline autoplay muted/>`,
+                    title: image.caption || ""
+                };
+            }
+
+            let title = image.caption;
+
             return {
                 src: image.url,
                 w: image.width,
                 h: image.height,
-                title: bindTo.props.text || ""
+                title: title
             };
         });
 
         gallery = <PhotoSwipe items={items} onClose={() => setExpandedState(bindTo, false)} />;
+    }
+
+    let img: JSX.Element;
+    if (bindTo.props.images[0].video === true) {
+        img = (
+            <video
+                src={bindTo.props.images[0].url}
+                style={imageStyles}
+                autoPlay={true}
+                muted={true}
+                playsInline={true}
+            />
+        );
+    } else {
+        img = <img src={bindTo.props.images[0].url} style={imageStyles} />;
     }
 
     return (
@@ -88,7 +116,7 @@ function renderImage(bindTo: ChatBubble) {
                 className={styles.bubbleImageContainer}
                 onClick={() => setExpandedState(bindTo, true)}
             >
-                <img src={bindTo.props.images[0].url} style={imageStyles} />
+                {img}
                 {gallery}
             </div>
         </div>
@@ -113,18 +141,15 @@ function renderLink(props: ChatBubbleProperties) {
         return null;
     }
 
-    let linkImage: JSX.Element | undefined;
-    if (props.link.image) {
-        linkImage = <img src={props.link.image} className={styles.bubbleLinkImage} />;
-    }
+    // let linkImage: JSX.Element | undefined;
+    // if (props.link.image) {
+    //     linkImage = <img src={props.link.image} className={styles.bubbleLinkImage} />;
+    // }
 
     return (
         <a target="_blank" className={styles.bubbleText + " " + styles.bubbleLink} href={props.link.url}>
-            <div>
-                <span className={styles.bubbleLinkTitle}>{props.link.title}</span>
-                <span className={styles.bubbleLinkDomain}>{props.link.domain}</span>
-            </div>
-            <div className={styles.bubbleLinkImageContainer}>{linkImage}</div>
+            {props.link.title}
+            {/* <div className={styles.bubbleLinkImageContainer}>{linkImage}</div> */}
         </a>
     );
 }
@@ -169,13 +194,27 @@ export class ChatBubble extends Component<ChatBubbleProperties, ChatBubbleState>
             className += " " + styles.bubbleTouch;
         }
 
+        let elements = [
+            renderChapterIndicator(this.props.chapterIndicator),
+            renderImage(this),
+            renderText(this),
+            renderLink(this.props)
+        ];
+
+        if (elements.some(el => el !== null) === false) {
+            return null;
+        }
+
+        let containerClassName = styles.bubbleContainer;
+
+        if (this.props.link) {
+            containerClassName += " " + styles.linkContainer;
+        }
+
         return (
-            <div className={styles.bubbleContainer} ref={el => (this.containerElement = el)}>
+            <div className={containerClassName} ref={el => (this.containerElement = el)}>
                 <div className={className} onTouchStart={this.setTouch} onTouchEnd={this.setTouch}>
-                    {renderChapterIndicator(this.props.chapterIndicator)}
-                    {renderImage(this)}
-                    {renderText(this)}
-                    {renderLink(this.props)}
+                    {elements}
                 </div>
             </div>
         );

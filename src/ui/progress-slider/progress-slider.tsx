@@ -151,12 +151,25 @@ export class ProgressSlider extends React.Component<ProgressSliderProps, Progres
                 containerStyles.transform = `translateX(${positionX - 6}px)`;
             }
         } else {
-            containerStyles.left = currentPositionPercent + "%";
+            if (this.sliderElement) {
+                // If we have already rendered, we'll use a CSS transform for better
+                // performance.
+                let percentToPx = Math.round(
+                    this.sliderElement!.clientWidth * (currentPositionPercent / 100)
+                );
+                containerStyles.transform = `translateX(${percentToPx - 6}px)`;
+            } else {
+                // but if we haven't, just use a percentage.
+                containerStyles.left = currentPositionPercent + "%";
+            }
         }
 
         return (
             <div className={styles.progressSlider} ref={el => (this.sliderElement = el)}>
-                <div className={styles.soFarBar} style={{ width: currentPositionPercent + "%" }} />
+                <div
+                    className={styles.soFarBar}
+                    style={{ transform: `scaleX(${currentPositionPercent / 100})` }}
+                />
                 {chapterPercents.map((percent, idx) => {
                     return (
                         <div

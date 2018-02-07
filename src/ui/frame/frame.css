@@ -46,6 +46,8 @@ body {
     font-size: 12px;
     display: block;
     flex-grow: 1;
+    /* this seems to limit Chrome's redraw needs */
+    width: 5em;
     /* font-weight: bold; */
 }
 

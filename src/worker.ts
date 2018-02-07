@@ -30,7 +30,11 @@ async function checkCache() {
     } else {
         console.info("Adding cache of podcast shell.");
         let newCache = await caches.open("podmod-shell");
-        await newCache.addAll(["styles.css", "./", "client.js"]);
+        try {
+            await newCache.addAll(["styles.css", "./", "client.js"]);
+        } catch (err) {
+            console.error("Failed to cache!", err);
+        }
     }
 }
 
@@ -95,9 +99,6 @@ CommandListener.listen();
 //     console.log("GOT MESSAGE");
 // });
 
-self.addEventListener("install", e => self.skipWaiting());
-self.addEventListener("activate", e => self.clients.claim());
-
 CommandListener.bind("show-notification", (n: ShowNotification) => {
     console.log("SHOW THIS?", n);
     self.registration.showNotification(n.title, {
@@ -134,7 +135,17 @@ CommandListener.bind("remove-notification", async (predicate: any) => {
     });
 });
 
-self.addEventListener("notificationclick", async e => {
+async function focusWindowIfExists() {
+    let allClients = await self.clients.matchAll();
+    if (allClients.length === 0) {
+        console.warn("Tried to focus browser window but there was none");
+        return;
+    }
+    (allClients[0] as WindowClient).focus();
+}
+
+self.addEventListener("notificationclick", e => {
+    console.log("NOTIFY HIT");
     e.notification.close();
 
     if (e.action === "open-link") {
@@ -142,8 +153,7 @@ self.addEventListener("notificationclick", async e => {
         return;
     }
 
-    let allClients = await self.clients.matchAll();
-    (allClients[0] as WindowClient).focus();
+    e.waitUntil(focusWindowIfExists());
 });
 
 setConfig({

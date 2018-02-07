@@ -52,6 +52,7 @@ interface PlayerProps {
 
 export class Frame extends React.Component<PlayerProps, PlayerState> {
     audioElement: HTMLAudioElement;
+    chatWindow: ChatWindow | null;
 
     constructor(props) {
         super(props);
@@ -93,6 +94,13 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                 downloadOffline: hasCacheAlready
             });
         });
+    }
+
+    shouldBeInitialView(state: PlayerState) {
+        return (
+            state.playback === undefined ||
+            (state.playState === PlayState.Paused && state.playback.current === 0)
+        );
     }
 
     render() {
@@ -138,9 +146,9 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
             chapterMarks = this.state.script.chapters.map(c => c.time);
         }
 
-        let isInitialView =
-            this.state.playback === undefined ||
-            (this.state.playState === PlayState.Paused && this.state.playback.current === 0);
+        let isInitialView = this.shouldBeInitialView(this.state);
+        // this.state.playback === undefined ||
+        // (this.state.playState === PlayState.Paused && this.state.playback.current === 0);
 
         return (
             <div className={styles.frame}>
@@ -154,6 +162,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                     script={this.state.script}
                     currentTime={this.state.playback ? this.state.playback.current : 0}
                     elements={this.state.scriptElements}
+                    ref={el => (this.chatWindow = el)}
                 />
                 <BottomSlider
                     className={styles.controls}
@@ -284,7 +293,9 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
         } else {
             this.audioElement.currentTime = toValue;
         }
-
+        if (this.nextSecondTimeout) {
+            clearTimeout(this.nextSecondTimeout);
+        }
         this.setState({
             playback: {
                 total: this.audioElement.duration,
@@ -405,6 +416,17 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
     }
 
     componentDidUpdate(oldProps, oldState: PlayerState) {
+        if (
+            this.chatWindow &&
+            this.shouldBeInitialView(this.state) === false &&
+            this.shouldBeInitialView(oldState) === true
+        ) {
+            // If we've moved from initial to non-initial then the scrollview size
+            // will have changed (after the header shrinks). So we need to make sure
+            // the scrollview updates accordingly.
+            this.chatWindow.refreshScrollViewSize();
+        }
+
         if ("mediaSession" in navigator === false) {
             // If we don't implement the MediaSession API then just ignore all this
             return;

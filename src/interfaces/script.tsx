@@ -40,15 +40,33 @@ function mapScriptEntry(response: ChatBubbleProperties, index: number, baseURL: 
 
     mappedProperties.text = response.text;
 
-    if (response.images) {
-        mappedProperties.images = response.images.map(image =>
-            Object.assign({}, image, {
-                url: makeRelative(image.url, baseURL.href)
-            })
-        );
-    }
-
     let elements: JSX.Element[] = [<ChatBubble {...mappedProperties} key={`item_${index}_main`} />];
+
+    let notificationOptions: ShowNotification = {
+        title: "Mona from The Guardian",
+        body: response.text,
+        icon: makeRelative("./bundles/mona-ep-1/mona-headshot-round.png", window.location.href),
+        badge: makeRelative("./bundles/mona-ep-1/gdn_badge.png", window.location.href)
+    };
+
+    if (response.images && response.images.length > 0) {
+        let images = response.images.map(image => {
+            let caption = response.text;
+
+            if (!response.text && response.link) {
+                caption = `<a target="_blank" href="${response.link.url}">${response.link.title}</a>`;
+            }
+
+            return Object.assign({}, image, {
+                url: makeRelative(image.url, baseURL.href),
+                caption: caption
+            });
+        });
+
+        notificationOptions.image = images[0].url;
+
+        elements.unshift(<ChatBubble time={response.time} key={`item_${index}_images`} images={images} />);
+    }
 
     if (response.link) {
         let url = new URL(response.link.url, baseURL.href);
@@ -71,13 +89,6 @@ function mapScriptEntry(response: ChatBubbleProperties, index: number, baseURL: 
         elements.push(<ChatBubble {...secondItemProperties} key={`item_${index}_link`} />);
     }
 
-    let notificationOptions: ShowNotification = {
-        title: "Mona from The Guardian",
-        body: response.text,
-        icon: makeRelative("./bundles/mona-ep-1/mona-headshot-round.png", window.location.href),
-        badge: makeRelative("./bundles/mona-ep-1/gdn_badge.png", window.location.href)
-    };
-
     if (response.link) {
         notificationOptions.actions = [
             {
@@ -88,10 +99,6 @@ function mapScriptEntry(response: ChatBubbleProperties, index: number, baseURL: 
         notificationOptions.data = {
             link_url: response.link.url
         };
-    }
-
-    if (mappedProperties.images && mappedProperties.images.length > 0) {
-        notificationOptions.image = mappedProperties.images[0].url;
     }
 
     return (

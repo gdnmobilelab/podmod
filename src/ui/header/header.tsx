@@ -16,7 +16,7 @@ export function Header(props: HeaderProperties) {
     let expandedClassName = styles.expandedHeader;
     if (props.showExpanded) {
         // expandedClassName += " " + styles.showExpandedHeader;
-        // headerClassName += " " + styles.headerExpand;
+        headerClassName += " " + styles.headerExpand;
     }
 
     return (

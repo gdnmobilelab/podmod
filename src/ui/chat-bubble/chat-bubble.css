@@ -96,3 +96,23 @@
 .bubble-image-container {
     /* margin-bottom: 10px; */
 }
+
+.expanded-video {
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.link-container {
+    padding-right: 20px;
+    background-image: url('data:image/svg+xml;utf8,<svg width="46" height="80" viewBox="0 0 46 80" xmlns="http://www.w3.org/2000/svg"><title>link-arrow</title><path d="M8 8l28.453 31.858L8.14 71.89" stroke-width="12" stroke="#F5B227" fill="none" fill-rule="evenodd" stroke-linecap="round"/></svg>');
+    background-repeat: no-repeat;
+    background-size: 15px auto;
+    background-position: right center;
+    margin-right: 10px;
+}
+
+:global(.pswp__caption) a {
+    color: #fff;
+}

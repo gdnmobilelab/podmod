@@ -9,6 +9,9 @@
     background: #579396;
     position: absolute;
     height: 100%;
+    width: 100%;
+    will-change: transform;
+    transform-origin: 0;
 }
 
 .current-position {
@@ -27,6 +30,7 @@
     position: absolute;
     border-radius: 50%;
     top: 0;
+    will-change: transform;
 }
 
 .picked-up-wrapper .current-position {

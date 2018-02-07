@@ -131,8 +131,9 @@ export class ChatWindow extends React.Component<ChatWindowProps, ChatWindowState
         );
     }
 
-    componentDidUpdate() {
-        console.log("scr", this.scrollView);
-        (window as any).SCROLLTEST = this.scrollView;
+    refreshScrollViewSize() {
+        if (this.scrollView) {
+            this.scrollView.recalculatePositions();
+        }
     }
 }

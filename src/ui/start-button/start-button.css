@@ -12,6 +12,7 @@
     /* total hack but it covers up the top of the slider control */
     margin-top: -5px;
     padding-top: 5px;
+    will-change: opacity, transform;
 }
 
 .hidden {
