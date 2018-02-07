@@ -101,10 +101,15 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
     }
 
     renderEpisodeNavigator() {
-        let label =
-            this.state.subscribed === SubscribeState.Subscribed
-                ? "Unsubscribe from episode alerts"
-                : "Subscribe to new episodes";
+        let label: string;
+
+        if (this.state.subscribed === SubscribeState.Subscribed) {
+            label = "Unsubscribe from episode alerts";
+        } else if (this.state.subscribed === SubscribeState.Unsubscribed) {
+            label = "Subscribe to new episodes";
+        } else {
+            label = "Working...";
+        }
 
         let episodes: Episode[] = [];
 

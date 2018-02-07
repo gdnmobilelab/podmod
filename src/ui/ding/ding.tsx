@@ -94,7 +94,7 @@ export class Ding extends React.Component<DingProps, any> {
             throw new Error("Tried to activate 'ding' element, but it didn't exist");
         }
         console.info("DING: activating <audio> element");
-        document.removeEventListener("touchstart", this.activateAudioElement);
+        document.removeEventListener("touchend", this.activateAudioElement);
         this.dingAudioElement.volume = 0;
         await this.dingAudioElement.play();
         this.dingAudioElement.pause();

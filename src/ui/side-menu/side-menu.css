@@ -142,3 +142,7 @@
     display: block;
     width: 100%;
 }
+
+.subscribe-button:disabled {
+    background: #ccc;
+}

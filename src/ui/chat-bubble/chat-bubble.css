@@ -111,6 +111,7 @@
     background-size: 15px auto;
     background-position: right center;
     margin-right: 10px;
+    display: inline-block;
 }
 
 :global(.pswp__caption) a {
