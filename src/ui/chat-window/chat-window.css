@@ -8,6 +8,7 @@
 }
 
 .chat-container {
+    margin: 0;
     flex-grow: 1;
     display: flex;
     overflow: hidden;
