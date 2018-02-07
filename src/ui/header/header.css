@@ -19,8 +19,10 @@
     background: #f5f2f0 url("../../../bundles/mona-ep-1/logo_big.jpg");
     background-repeat: no-repeat;
     background-size: 100% auto;
-    width: 1200px;
+    width: 866px;
     position: absolute;
+    left: 20px;
+    top: 5px;
     height: 1425px;
     transform: translate3d(-209px, -172px, 0);
     transform-origin: 0 192px;
@@ -46,7 +48,7 @@
 }
 
 .header-expand {
-    height: 200px;
+    height: 154px;
 }
 
 .header-expand .header-eye {
@@ -56,7 +58,7 @@
 .header-interior {
     background-color: #f5f2f0;
     position: absolute;
-    height: 200px;
+    height: 154px;
     width: 100%;
     z-index: 2;
     overflow: hidden;
@@ -72,10 +74,10 @@
 
 .header h1 {
     margin: 0;
-    font-size: 25px;
+    font-size: 28px;
     /* text-indent: 9vh; */
     padding: 0.5vh;
-    margin: 0.5vh;
+    /* margin: 0.5vh; */
     position: absolute;
 }
 
@@ -89,16 +91,16 @@
 }
 
 .header-expand .strange-bird-title {
-    transform: translate3d(180px, 50px, 0);
+    transform: translate3d(158px, 34px, 0);
 }
 
 .header p {
     font-family: "Guardian Text Egyptian Web";
     font-weight: 400;
     position: absolute;
-    padding-left: 180px;
+    padding-left: 159px;
     padding-right: 20px;
-    top: 80px;
+    top: 60px;
     opacity: 0;
     will-change: opacity;
     transition: opacity 0.1s linear;
