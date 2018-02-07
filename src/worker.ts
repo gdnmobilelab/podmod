@@ -41,7 +41,9 @@ async function checkCache() {
 async function clientClaim() {
     await self.clients.claim();
     let clients = await self.clients.matchAll();
-
+    if (ENVIRONMENT !== "production") {
+        return;
+    }
     clients.forEach(c =>
         c.postMessage({
             command: "reload-if",
