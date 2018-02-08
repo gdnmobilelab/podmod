@@ -150,19 +150,28 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
             throw new Error("Cannot toggle subscription state as it is not known");
         }
 
+        let oldState = this.state.subscribed;
+
         this.setState({
             subscribed: SubscribeState.Unknown
         });
 
-        if (this.state.subscribed === SubscribeState.Subscribed) {
-            let sub = await unsubscribe(SUBSCRIPTION_TOPIC);
+        try {
+            if (this.state.subscribed === SubscribeState.Subscribed) {
+                let sub = await unsubscribe(SUBSCRIPTION_TOPIC);
+                this.setState({
+                    subscribed: SubscribeState.Unsubscribed
+                });
+            } else {
+                let sub = await subscribe(SUBSCRIPTION_TOPIC);
+                this.setState({
+                    subscribed: SubscribeState.Subscribed
+                });
+            }
+        } catch (err) {
+            console.error(err);
             this.setState({
-                subscribed: SubscribeState.Unsubscribed
-            });
-        } else {
-            let sub = await subscribe(SUBSCRIPTION_TOPIC);
-            this.setState({
-                subscribed: SubscribeState.Subscribed
+                subscribed: oldState
             });
         }
     }

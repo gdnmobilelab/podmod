@@ -15,6 +15,7 @@ interface ProgressSliderState {
     pickupX?: number;
     moveX?: number;
     maximumX?: number;
+    minimumX?: number;
 }
 
 function getXFromEvent(e: React.TouchEvent<HTMLDivElement> | React.MouseEvent<HTMLDivElement>) {}
@@ -61,7 +62,7 @@ export class ProgressSlider extends React.Component<ProgressSliderProps, Progres
     }
 
     updateMovePosition(newX: number) {
-        if (!this.state.pickupX || !this.state.maximumX) {
+        if (!this.state.pickupX || !this.state.maximumX || !this.state.minimumX) {
             throw new Error("Called move update without first calling pickup");
         }
 
@@ -69,7 +70,7 @@ export class ProgressSlider extends React.Component<ProgressSliderProps, Progres
 
         // positionX = Math.max(positionX, 0);
         positionX = Math.min(positionX, this.state.maximumX);
-        positionX = Math.max(positionX, 0);
+        positionX = Math.max(positionX, this.state.minimumX);
 
         this.setState({
             moveX: positionX
@@ -120,13 +121,14 @@ export class ProgressSlider extends React.Component<ProgressSliderProps, Progres
             );
         }
 
-        let { width } = this.sliderElement.getBoundingClientRect();
+        let { width, left } = this.sliderElement.getBoundingClientRect();
 
         this.setState({
             pickupTime: this.props.currentPosition,
             pickupX: pickupX,
             moveX: 0,
-            maximumX: width
+            maximumX: width,
+            minimumX: 0 - pickupX + left
         });
     }
 
@@ -204,6 +206,7 @@ export class ProgressSlider extends React.Component<ProgressSliderProps, Progres
                 <div className={styles.progressSliderTouchTarget} onClick={this.progressBarClick} />
                 <div
                     onTouchStart={this.pickupScrubberTouch}
+                    onMouseDown={this.pickupScrubberMouse}
                     // onPointerUp={() => {
                     //     this.setState({ pickupTime: undefined });
                     // }}
