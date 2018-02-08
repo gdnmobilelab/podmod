@@ -197,8 +197,8 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                     <Controls
                         onPlay={() => this.play()}
                         onPause={() => this.pause()}
-                        onRewind={() => this.setTime(-10, true)}
-                        onFastForward={() => this.setTime(10, true)}
+                        onRewind={() => this.setTime(-15, true)}
+                        onFastForward={() => this.setTime(15, true)}
                         onSkipBack={() => this.moveChapter(-1)}
                         onSkipForward={() => this.moveChapter(1)}
                         canPlay={this.state.playState == PlayState.Paused}
@@ -295,6 +295,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
         }
         if (this.nextSecondTimeout) {
             clearTimeout(this.nextSecondTimeout);
+            this.nextSecondTimeout = undefined;
         }
         this.setState({
             playback: {

@@ -5,6 +5,18 @@
     background: #f8c968;
 }
 
+.progress-slider-touch-target {
+    position: absolute;
+    background: rgba(0, 0, 0, 0);
+    height: 200%;
+    width: 100%;
+    transform: translateY(-50%);
+    top: 50%;
+    /* Add this so it goes to the edges of the screen */
+    left: -10px;
+    padding: 0 10px;
+}
+
 .so-far-bar {
     background: #579396;
     position: absolute;

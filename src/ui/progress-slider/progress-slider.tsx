@@ -30,6 +30,26 @@ export class ProgressSlider extends React.Component<ProgressSliderProps, Progres
         this.dropScrubber = this.dropScrubber.bind(this);
         this.pickupScrubberTouch = this.pickupScrubberTouch.bind(this);
         this.pickupScrubberMouse = this.pickupScrubberMouse.bind(this);
+        this.progressBarClick = this.progressBarClick.bind(this);
+    }
+
+    progressBarClick(e: React.MouseEvent<HTMLDivElement>) {
+        if (this.state.pickupTime) {
+            // We're already in a pickup event, so ignore the click
+            return;
+        }
+        if (!this.sliderElement) {
+            throw new Error("No slider element");
+        }
+
+        let sliderRect = this.sliderElement.getBoundingClientRect();
+        let newX = e.clientX - sliderRect.left;
+        newX = Math.max(newX, 0);
+        newX = Math.min(newX, sliderRect.width);
+
+        let xPercent = newX / sliderRect.width;
+
+        this.props.onSliderChange(this.props.length * xPercent);
     }
 
     updateMovePositionMouse(e: MouseEvent) {
@@ -49,6 +69,7 @@ export class ProgressSlider extends React.Component<ProgressSliderProps, Progres
 
         // positionX = Math.max(positionX, 0);
         positionX = Math.min(positionX, this.state.maximumX);
+        positionX = Math.max(positionX, 0);
 
         this.setState({
             moveX: positionX
@@ -170,6 +191,7 @@ export class ProgressSlider extends React.Component<ProgressSliderProps, Progres
                     className={styles.soFarBar}
                     style={{ transform: `scaleX(${currentPositionPercent / 100})` }}
                 />
+
                 {chapterPercents.map((percent, idx) => {
                     return (
                         <div
@@ -179,6 +201,7 @@ export class ProgressSlider extends React.Component<ProgressSliderProps, Progres
                         />
                     );
                 })}
+                <div className={styles.progressSliderTouchTarget} onClick={this.progressBarClick} />
                 <div
                     onTouchStart={this.pickupScrubberTouch}
                     // onPointerUp={() => {
