@@ -85,12 +85,14 @@
 .side-menu h4 {
     font-weight: bold;
     margin: 0;
-    margin: 20px 0 10px;
+    margin: 32px 0 10px;
 }
 
 .side-menu p {
-    font-size: 13px;
     line-height: 1.3em;
+    font-family: "Guardian Sans Web";
+    font-size: 14px;
+    margin-top: 0;
 }
 
 .episode-list {
