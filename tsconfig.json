@@ -7,7 +7,8 @@
         "moduleResolution": "node",
         "allowJs": true,
         "outDir": "lib",
-        "strictNullChecks": true
+        "strictNullChecks": true,
+        "importHelpers": true
     },
     "include": ["src"]
 }

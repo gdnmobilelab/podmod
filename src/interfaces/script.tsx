@@ -1,6 +1,6 @@
 import { ChatBubbleProperties, ChatBubble } from "../ui/chat-bubble/chat-bubble";
 import { BubbleGroup } from "../ui/bubble-group/bubble-group";
-import { ShowNotification } from "./notification";
+import { ShowNotification, RunCommand } from "worker-commands";
 import * as React from "react";
 
 export interface Chapter {
@@ -44,9 +44,26 @@ function mapScriptEntry(response: ChatBubbleProperties, index: number, baseURL: 
 
     let notificationOptions: ShowNotification = {
         title: "Mona from The Guardian",
-        body: response.text,
+        body: response.text || response.notificationOnlyText || "",
         icon: makeRelative("./bundles/mona-ep-1/mona-headshot-round.png", window.location.href),
-        badge: makeRelative("./bundles/mona-ep-1/gdn_badge.png", window.location.href)
+        badge: makeRelative("./bundles/mona-ep-1/gdn_badge.png", window.location.href),
+        events: {
+            onclick: [
+                {
+                    command: "notification.close"
+                },
+                {
+                    command: "podmod.closephoto"
+                },
+                {
+                    command: "browser.focus",
+                    options: {
+                        url: window.location.href,
+                        ignoreHash: true
+                    }
+                }
+            ]
+        }
     };
 
     if (response.images && response.images.length > 0) {
@@ -64,6 +81,13 @@ function mapScriptEntry(response: ChatBubbleProperties, index: number, baseURL: 
         });
 
         notificationOptions.image = images[0].url;
+
+        (notificationOptions.events!.onclick as RunCommand<any>[]).push({
+            command: "podmod.openphoto",
+            options: {
+                url: images[0].url
+            }
+        });
 
         elements.unshift(<ChatBubble time={response.time} key={`item_${index}_images`} images={images} />);
     }
@@ -90,15 +114,25 @@ function mapScriptEntry(response: ChatBubbleProperties, index: number, baseURL: 
     }
 
     if (response.link) {
+        notificationOptions.body = response.link.title;
         notificationOptions.actions = [
             {
-                action: "open-link",
+                action: "openlink",
                 title: "Open link"
             }
         ];
-        notificationOptions.data = {
-            link_url: response.link.url
-        };
+
+        notificationOptions.events!.onopenlink = [
+            {
+                command: "notification.close"
+            },
+            {
+                command: "browser.open",
+                options: {
+                    url: response.link.url
+                }
+            }
+        ];
     }
 
     return (

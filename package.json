@@ -52,6 +52,8 @@
         "react-pointable": "^1.1.1",
         "service-worker-command-bridge": "https://github.com/gdnmobilelab/service-worker-command-bridge.git",
         "treo": "^0.5.1",
-        "treo-promise": "^1.0.3"
+        "treo-promise": "^1.0.3",
+        "tslib": "^1.9.0",
+        "worker-commands": "git+https://github.com/alastaircoote/worker-commands.git"
     }
 }

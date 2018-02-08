@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ShowNotification } from "../../interfaces/notification";
+import { ShowNotification } from "worker-commands";
 import { makeRelative } from "../../interfaces/script";
 import { sendNotification, removeNotification } from "../../util/notification-dispatch";
 import { activeDing } from "../ding/ding";
@@ -44,12 +44,8 @@ export class BubbleGroup extends React.Component<BubbleGroupProperties, BubbleGr
             return;
         }
 
-        let data = Object.assign({}, this.props.notification.data, {
-            uuid: this.state.uuid
-        });
-
         let notificationOptions: ShowNotification = Object.assign({}, this.props.notification, {
-            data
+            tag: this.state.uuid
         });
 
         sendNotification(notificationOptions);
