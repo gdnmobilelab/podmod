@@ -5,6 +5,11 @@
     /* transform: translateY(-100%); */
 }
 
+/* we may want to give this div a class */
+.bottom-info > div {
+    text-align: center;
+}
+
 .bottom-info h3 {
     margin: 0;
     font-family: "Guardian Text Egyptian Web";
@@ -12,14 +17,14 @@
 
 .description {
     font-family: "Guardian Sans Web";
-    font-size: 14px;
+    font-size: 16px;
     line-height: 1.3em;
 }
 
 .subtitle {
     color: #fad893;
     font-family: "Guardian Sans Web";
-    font-size: 13px;
+    font-size: 16px;
     margin: 0.5em 0 1em;
 }
 
@@ -27,13 +32,14 @@
     color: #bd8b55;
     background: #fff;
     border: none;
-    padding: 7px 15px;
+    padding: 7px 10px;
     font-family: "Guardian Sans Web";
-    border-radius: 10px;
+    border-radius: 14px;
     padding-left: 30px;
     position: relative;
-    margin-right: 10px;
+    margin: 0 3px;
     overflow: hidden;
+    font-size: 14px;
 }
 
 .bottom-info-button-text {
