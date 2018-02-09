@@ -11,3 +11,5 @@ export const episodeEntry: string;
 export const episodeName: string;
 export const episodeStatus: string;
 export const subscribeButton: string;
+export const theTeam: string;
+export const contactUs: string;

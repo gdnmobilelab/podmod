@@ -3,6 +3,7 @@ import * as React from "react";
 import { Script } from "../../interfaces/script";
 import { checkIfSubscribed, subscribe, unsubscribe } from "../../util/subscription";
 import { ContactBox } from "../contact-box/contact-box";
+import { makeRelative } from "../../interfaces/script";
 
 interface SideMenuState {
     opened: boolean;
@@ -42,7 +43,7 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
 
     render() {
         let containerStyles = styles.sideMenuContainer;
-        if (this.state.opened) {
+        if (this.state.opened || 1 == 1) {
             containerStyles += " " + styles.openedContainer;
         }
 
@@ -84,6 +85,65 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
                         >
                             Ask Mona a Question
                         </button>
+                        <h4>Give Feedback</h4>
+                        <p>
+                            Read about this experimental format here. We want to know what you think about the
+                            show.
+                        </p>
+                        <a target="_blank" href="" className={styles.subscribeButton}>
+                            Take a quick survey
+                        </a>
+                        <h4>The Team</h4>
+                        <ul className={styles.theTeam}>
+                            <li>
+                                <img
+                                    src={makeRelative(
+                                        "./bundles/mona-ep-1/mona-headshot-round.png",
+                                        window.location.href
+                                    )}
+                                />
+                                <div>
+                                    <p>
+                                        <em>Host</em>
+                                    </p>
+                                    <p>Mona Chalabi</p>
+                                    <p>Data Editor, The Guardian</p>
+                                </div>
+                            </li>
+                            <li>
+                                <img
+                                    src={makeRelative(
+                                        "./bundles/mona-ep-1/mona-headshot-round.png",
+                                        window.location.href
+                                    )}
+                                />
+                                <div>
+                                    <p>
+                                        <em>Producer</em>
+                                    </p>
+                                    <p>Josie Holtzman</p>
+                                    <p>Producer, Roads and Kingdoms</p>
+                                </div>
+                            </li>
+                            <li>
+                                <img
+                                    src={makeRelative(
+                                        "./bundles/mona-ep-1/gmil-logo.svg",
+                                        window.location.href
+                                    )}
+                                />
+                                <div>
+                                    <p>
+                                        <em>Concept &amp; Development</em>
+                                    </p>
+                                    <p>The Guardian Mobile Innovation Lab</p>
+                                </div>
+                            </li>
+                        </ul>
+                        <p className={styles.contactUs}>
+                            Contact us:{" "}
+                            <a href="mailto:innovationlab@theguardian.com">innovationlab@theguardian.com</a>
+                        </p>
                     </div>
                 </div>
             </div>
