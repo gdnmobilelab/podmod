@@ -53,7 +53,11 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
         }
 
         return (
-            <div className={containerStyles} onClick={() => this.setState({ opened: false })}>
+            <div
+                className={containerStyles}
+                onClick={() => this.setState({ opened: false })}
+                onTouchMove={e => e.stopPropagation()}
+            >
                 {contactBox}
                 <button
                     className={styles.openerButton}
@@ -68,9 +72,8 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
                     >
                         Close
                     </button>
+                    <div className={styles.topWing} />
                     <div className={styles.scroller}>
-                        <div className={styles.topWing} />
-
                         {this.renderEpisodeDetails()}
                         {this.renderEpisodeNavigator()}
                         <h4>Ask Mona a Data Question</h4>
@@ -121,6 +124,20 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
             });
         }
 
+        let subscribeButton: JSX.Element | null = null;
+
+        if ("Notification" in window && "serviceWorker" in navigator) {
+            subscribeButton = (
+                <button
+                    className={styles.subscribeButton}
+                    disabled={this.state.subscribed === SubscribeState.Unknown}
+                    onClick={this.toggleSubscriptionState}
+                >
+                    {label}
+                </button>
+            );
+        }
+
         return (
             <div>
                 <h4>Episodes</h4>
@@ -134,13 +151,7 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
                         );
                     })}
                 </ul>
-                <button
-                    className={styles.subscribeButton}
-                    disabled={this.state.subscribed === SubscribeState.Unknown}
-                    onClick={this.toggleSubscriptionState}
-                >
-                    {label}
-                </button>
+                {subscribeButton}
             </div>
         );
     }
@@ -182,10 +193,12 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
     }
 
     async componentDidMount() {
-        let isSubscribed = await checkIfSubscribed(SUBSCRIPTION_TOPIC);
+        if ("Notification" in window && "serviceWorker" in navigator) {
+            let isSubscribed = await checkIfSubscribed(SUBSCRIPTION_TOPIC);
 
-        this.setState({
-            subscribed: isSubscribed ? SubscribeState.Subscribed : SubscribeState.Unsubscribed
-        });
+            this.setState({
+                subscribed: isSubscribed ? SubscribeState.Subscribed : SubscribeState.Unsubscribed
+            });
+        }
     }
 }

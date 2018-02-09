@@ -78,6 +78,9 @@ export class Downloader extends React.Component<DownloaderProps, DownloaderState
     }
 
     render() {
+        if (!window.caches) {
+            return null;
+        }
         let { cacheName, urls, barClassName, doDownload, ...htmlProps } = this.props;
 
         let soFar = this.state.downloadCurrent / this.state.downloadTotal;

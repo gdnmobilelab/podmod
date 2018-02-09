@@ -42,32 +42,41 @@ export class BottomInfo extends React.Component<BottomInfoProps, BottomInfoState
 
         let minutes = Math.round(this.props.script.metadata.length / 60);
 
-        let buttons: JSX.Element[] = [
-            <button
-                key="offline-download"
-                className={styles.withCheckbox}
-                onClick={() => this.props.offlineDownloadChange(!this.props.offlineDownloadEnabled)}
-            >
-                <Downloader
-                    barClassName={styles.downloadBar}
-                    urls={this.props.script.assets}
-                    cacheName={this.props.script.podcastId + "_" + this.props.script.episodeId}
-                    doDownload={this.props.offlineDownloadEnabled}
-                    className={styles.downloadBar}
-                />
-                <span className={getCheckedClassName(this.props.offlineDownloadEnabled)} />
-                <span className={styles.bottomInfoButtonText}>Save for Offline</span>
-            </button>,
-            <button
-                key="show-alerts"
-                className={styles.withCheckbox}
-                onClick={() => this.props.onAlertChange(!this.props.alertsEnabled)}
-            >
-                <span className={getCheckedClassName(this.props.alertsEnabled)} />Show Alerts
-            </button>
-        ];
+        let buttons: JSX.Element[] = [];
 
-        if ("share" in navigator || 1 == 1) {
+        if ("caches" in window) {
+            buttons.push(
+                <button
+                    key="offline-download"
+                    className={styles.withCheckbox}
+                    onClick={() => this.props.offlineDownloadChange(!this.props.offlineDownloadEnabled)}
+                >
+                    <Downloader
+                        barClassName={styles.downloadBar}
+                        urls={this.props.script.assets}
+                        cacheName={this.props.script.podcastId + "_" + this.props.script.episodeId}
+                        doDownload={this.props.offlineDownloadEnabled}
+                        className={styles.downloadBar}
+                    />
+                    <span className={getCheckedClassName(this.props.offlineDownloadEnabled)} />
+                    <span className={styles.bottomInfoButtonText}>Save for Offline</span>
+                </button>
+            );
+        }
+
+        if ("Notification" in window) {
+            buttons.push(
+                <button
+                    key="show-alerts"
+                    className={styles.withCheckbox}
+                    onClick={() => this.props.onAlertChange(!this.props.alertsEnabled)}
+                >
+                    <span className={getCheckedClassName(this.props.alertsEnabled)} />Show Alerts
+                </button>
+            );
+        }
+
+        if ("share" in navigator) {
             buttons.push(
                 <button onClick={this.share} key="share">
                     <span className={styles.share} />Share

@@ -14,6 +14,7 @@ export interface ScriptMetadata {
     avatarFile: string;
     length: number;
     episodeName: string;
+    artwork: string;
 }
 
 export interface Script {
@@ -46,7 +47,7 @@ function mapScriptEntry(response: ChatBubbleProperties, index: number, baseURL: 
         title: "Mona from The Guardian",
         body: response.text || response.notificationOnlyText || "",
         icon: makeRelative("./bundles/mona-ep-1/mona-headshot-round.png", window.location.href),
-        badge: makeRelative("./bundles/mona-ep-1/gdn_badge.png", window.location.href),
+        badge: makeRelative("./bundles/mona-ep-1/lab_badge.png", window.location.href),
         events: {
             onclick: [
                 {
@@ -56,11 +57,7 @@ function mapScriptEntry(response: ChatBubbleProperties, index: number, baseURL: 
                     command: "podmod.closephoto"
                 },
                 {
-                    command: "browser.focus",
-                    options: {
-                        url: window.location.href,
-                        ignoreHash: true
-                    }
+                    command: "clients.focus"
                 }
             ]
         }
@@ -127,7 +124,7 @@ function mapScriptEntry(response: ChatBubbleProperties, index: number, baseURL: 
                 command: "notification.close"
             },
             {
-                command: "browser.open",
+                command: "clients.open",
                 options: {
                     url: response.link.url
                 }

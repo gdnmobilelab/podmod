@@ -124,7 +124,7 @@ export class ChatWindow extends React.Component<ChatWindowProps, ChatWindowState
             );
         }
         return (
-            <div className={styles.chatContainer}>
+            <div className={styles.chatContainer} onTouchMove={e => e.stopPropagation()}>
                 {innerView}
                 {avatar}
             </div>
