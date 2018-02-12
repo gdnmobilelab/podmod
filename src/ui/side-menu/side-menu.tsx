@@ -12,6 +12,7 @@ interface SideMenuState {
 interface SideMenuProps {
     script?: Script;
     toggleContactBox: () => void;
+    isPlaying: boolean;
 }
 
 interface Episode {
@@ -180,11 +181,15 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
         let episodes: Episode[] = [];
 
         if (this.props.script) {
-            episodes.push({
+            let episode = {
                 name: this.props.script.metadata.episodeName,
                 id: this.props.script.episodeId,
-                status: "playing"
-            });
+                status: ""
+            };
+            if (episode.id === this.props.script.episodeId && this.props.isPlaying) {
+                episode.status = "playing";
+            }
+            episodes.push(episode);
         }
 
         let subscribeButton: JSX.Element | null = null;
@@ -206,8 +211,13 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
                 <h4>Episodes</h4>
                 <ul className={styles.episodeList}>
                     {episodes.map(episode => {
+                        let className = styles.episodeEntry;
+                        if (this.props.script && episode.id !== this.props.script.episodeId) {
+                            className + " " + styles.episodeEntryWithArrow;
+                        }
+
                         return (
-                            <li className={styles.episodeEntry}>
+                            <li className={className}>
                                 <span className={styles.episodeName}>{episode.name}</span>
                                 <span className={styles.episodeStatus}>{episode.status}</span>
                             </li>

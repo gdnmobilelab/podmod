@@ -245,7 +245,11 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                     />
                 </BottomSlider>
                 {contactBox}
-                <SideMenu script={this.state.script} toggleContactBox={this.toggleContactWindow} />
+                <SideMenu
+                    script={this.state.script}
+                    toggleContactBox={this.toggleContactWindow}
+                    isPlaying={this.state.playback !== undefined}
+                />
             </div>
         );
     }
@@ -269,7 +273,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
         if (!this.state.playback) {
             this.setState({
                 playback: {
-                    current: 0,
+                    current: 0.1,
                     total: -1,
                     manuallyScrubbed: false
                 }

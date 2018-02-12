@@ -8,6 +8,7 @@ export const strangebirdHeader: string;
 export const closerButton: string;
 export const episodeList: string;
 export const episodeEntry: string;
+export const episodeEntryWithArrow: string;
 export const episodeName: string;
 export const episodeStatus: string;
 export const subscribeButton: string;

@@ -115,6 +115,9 @@
     font-weight: bold;
     display: flex;
     margin-bottom: 5px;
+}
+
+.episodeEntryWithArrow {
     background-image: url('data:image/svg+xml;utf8,<svg width="23" height="45" viewBox="0 0 23 45" xmlns="http://www.w3.org/2000/svg"><title>right-arrow</title><path d="M3 41.353l16.74-19.176L3 3" stroke-width="4" stroke="#F5B227" fill="none" fill-rule="evenodd" stroke-linecap="round"/></svg>');
     background-size: auto 60%;
     background-position: 96% center;
