@@ -29,7 +29,15 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker.onmessage = (e: ServiceWorkerMessageEvent) => {
         console.info("Received message from service worker:", e.data);
         if (e.data.command === "reload-if" && e.data.buildTime !== BUILD_TIME) {
-            window.location.reload();
+            let currentLocation = new URL(window.location.href);
+            if (currentLocation.searchParams.get("reloaded")) {
+                // We've already reloaded. To avoid a loop, don't do anything more
+                return;
+            }
+
+            currentLocation.searchParams.set("reloaded", "1");
+
+            window.location.href = currentLocation.href;
         }
     };
 }
