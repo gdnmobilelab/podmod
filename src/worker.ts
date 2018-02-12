@@ -150,7 +150,13 @@ setConfig({
     host: PUSHKIN_HOST
 });
 
-CommandListener.bind("get-subscribed-topics", getSubscribedTopics);
+CommandListener.bind("get-subscribed-topics", () => {
+    console.info("WORKER: getting subscribed topics from pushkin");
+    return getSubscribedTopics().then(topics => {
+        console.log("got topics!", topics);
+        return topics;
+    });
+});
 CommandListener.bind("push-subscribe", (opts: SubscribeOptions) => {
     return subscribeToTopic(opts);
 });

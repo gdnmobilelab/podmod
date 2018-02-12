@@ -4,6 +4,7 @@ import * as styles from "./chat-window.css";
 import { PerformanceScrollView, AddNewItemsTo } from "performance-scroll-view";
 import { ChatBubble, ChatBubbleProperties } from "../chat-bubble/chat-bubble";
 import { Script } from "../../interfaces/script";
+import { activeDing } from "../ding/ding";
 
 interface ChatWindowState {
     numberOfVisibleItems: number;
@@ -13,6 +14,7 @@ interface ChatWindowProps {
     script?: Script;
     elements?: JSX.Element[];
     currentTime: number;
+    playDings: boolean;
 }
 
 function easeOutBack(t: number, b: number, c: number, d: number, s: number = 0) {
@@ -63,6 +65,10 @@ export class ChatWindow extends React.Component<ChatWindowProps, ChatWindowState
             // if we don't have a script yet, ignore
             return;
         }
+        if (activeDing) {
+            activeDing.shouldPlayDings = newProps.playDings;
+        }
+
         let timeChange = newProps.currentTime !== this.props.currentTime;
         let scriptChange = newProps.script !== this.props.script;
 

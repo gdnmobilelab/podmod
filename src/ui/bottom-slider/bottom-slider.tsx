@@ -1,7 +1,6 @@
 import * as React from "react";
 
-interface BottomSliderProps {
-    className?: string;
+interface BottomSliderProps extends React.HTMLAttributes<HTMLDivElement> {
     bottomElement: JSX.Element;
     expanded: boolean;
 }
@@ -32,7 +31,7 @@ export class BottomSlider extends React.Component<BottomSliderProps, BottomSlide
         }
 
         return (
-            <div className={this.props.className} style={containerStyles}>
+            <div className={this.props.className} onClick={this.props.onClick} style={containerStyles}>
                 {this.props.children}
                 <div ref={el => (this.bottomElementContainer = el)} style={bottomContainerStyles}>
                     {this.props.bottomElement}

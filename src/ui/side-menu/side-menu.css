@@ -73,10 +73,11 @@
 .strangebird-header {
     background: url("../../../bundles/mona-ep-1/strange_bird_header.svg");
     background-repeat: no-repeat;
-    background-size: auto 100%;
+    background-size: contain;
     color: transparent;
     font-size: 40px;
     margin: 0;
+    max-width: 100%;
 }
 
 .closer-button {
@@ -177,6 +178,7 @@
     width: 70px;
     height: 70px;
     border-radius: 50%;
+    flex-shrink: 0;
 }
 
 .the-team em {

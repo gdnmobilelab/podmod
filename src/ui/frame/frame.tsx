@@ -13,7 +13,7 @@ import { StartButton } from "../start-button/start-button";
 import { ProgressSlider } from "../progress-slider/progress-slider";
 import { SideMenu } from "../side-menu/side-menu";
 import { BottomSlider } from "../bottom-slider/bottom-slider";
-import { Ding } from "../ding/ding";
+import { Ding, activeDing } from "../ding/ding";
 import { BottomInfo } from "../bottom-info/bottom-info";
 import { fontsLoaded } from "../../util/fonts";
 import { TimeFormatter } from "../time-formatter/time-formatter";
@@ -37,6 +37,7 @@ interface PlayerState {
     playback?: {
         current: number;
         total: number;
+        manuallyScrubbed: boolean;
     };
     playState: PlayState;
     script?: Script;
@@ -190,6 +191,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                     currentTime={this.state.playback ? this.state.playback.current : 0}
                     elements={this.state.scriptElements}
                     ref={el => (this.chatWindow = el)}
+                    playDings={this.state.playback ? !this.state.playback.manuallyScrubbed : true}
                 />
                 <BottomSlider
                     className={styles.controls}
@@ -268,7 +270,8 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
             this.setState({
                 playback: {
                     current: 0,
-                    total: -1
+                    total: -1,
+                    manuallyScrubbed: false
                 }
             });
         }
@@ -330,7 +333,8 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
         this.setState({
             playback: {
                 total: this.audioElement.duration,
-                current: this.audioElement.currentTime
+                current: this.audioElement.currentTime,
+                manuallyScrubbed: true
             }
         });
     }
@@ -411,7 +415,8 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
             this.setState({
                 playback: {
                     current: nextSecond,
-                    total: this.audioElement.duration
+                    total: this.audioElement.duration,
+                    manuallyScrubbed: false
                 },
                 currentChapterName: chapterName
             });

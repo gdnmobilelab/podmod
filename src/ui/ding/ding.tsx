@@ -52,6 +52,8 @@ export let activeDing: Ding | undefined;
 export class Ding extends React.Component<DingProps, any> {
     dingAudioElement: HTMLAudioElement | null;
 
+    shouldPlayDings: boolean = true;
+
     constructor(props) {
         super(props);
         this.activateAudioElement = this.activateAudioElement.bind(this);
@@ -69,6 +71,9 @@ export class Ding extends React.Component<DingProps, any> {
     }
 
     async ding() {
+        if (this.shouldPlayDings === false) {
+            return;
+        }
         console.info("DING: dinging");
         if (!this.dingAudioElement) {
             throw new Error("Tried to play 'ding' element, but it didn't exist");

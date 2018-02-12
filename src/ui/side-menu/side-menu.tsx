@@ -33,10 +33,19 @@ export let showOrHideSideMenu: () => void;
 export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
     constructor(props) {
         super(props);
-        this.state = {
+        let state = {
             opened: false,
             subscribed: SubscribeState.Unknown
         };
+
+        if ("Notification" in window && (Notification as any).permission === "default") {
+            // We can't request subscription details without getting notification
+            // permission first, so we don't check
+            state.subscribed = SubscribeState.Unsubscribed;
+        }
+
+        this.state = state;
+
         this.setAndStopPropagation = this.setAndStopPropagation.bind(this);
         this.toggleSubscriptionState = this.toggleSubscriptionState.bind(this);
     }
@@ -73,14 +82,18 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
                         <h4>Ask Mona a Data Question</h4>
                         <p>Contact Mona by X, Y, Z</p>
                         <button className={styles.subscribeButton} onClick={this.props.toggleContactBox}>
-                            Ask Mona a Question
+                            Ask Mona a question
                         </button>
                         <h4>Give Feedback</h4>
                         <p>
                             Read about this experimental format here. We want to know what you think about the
                             show.
                         </p>
-                        <a target="_blank" href="" className={styles.subscribeButton}>
+                        <a
+                            target="_blank"
+                            href="https://goo.gl/forms/LO6GvPYWRfvR9rpv2"
+                            className={styles.subscribeButton}
+                        >
                             Take a quick survey
                         </a>
                         <h4>The Team</h4>
@@ -211,6 +224,12 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
             throw new Error("Cannot toggle subscription state as it is not known");
         }
 
+        let permission = await Notification.requestPermission();
+
+        if (permission !== "granted") {
+            throw new Error("We do not have notification permissions");
+        }
+
         let oldState = this.state.subscribed;
 
         this.setState({
@@ -248,9 +267,12 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
                 opened: !this.state.opened
             });
         };
-        if ("Notification" in window && "serviceWorker" in navigator) {
+        if (
+            "Notification" in window &&
+            "serviceWorker" in navigator &&
+            (Notification as any).permission === "granted"
+        ) {
             let isSubscribed = await checkIfSubscribed(SUBSCRIPTION_TOPIC);
-
             this.setState({
                 subscribed: isSubscribed ? SubscribeState.Subscribed : SubscribeState.Unsubscribed
             });
