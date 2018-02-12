@@ -22,6 +22,16 @@ function easeOutBack(t: number, b: number, c: number, d: number, s: number = 0) 
     return c * ((t = t / d - 1) * t * ((s + 1) * t + s) + 1) + b;
 }
 
+function newMessageGenerator(numberOfMessages: number) {
+    let messagesText = numberOfMessages > 1 ? "messages" : "message";
+
+    return (
+        <div className={styles.moreMessages}>
+            {numberOfMessages} new {messagesText}
+        </div>
+    );
+}
+
 export class ChatWindow extends React.Component<ChatWindowProps, ChatWindowState> {
     container: HTMLDivElement;
 
@@ -108,6 +118,7 @@ export class ChatWindow extends React.Component<ChatWindowProps, ChatWindowState
                     animationDuration={750}
                     startIndex={this.state.numberOfVisibleItems - 1}
                     ref={el => (this.scrollView = el)}
+                    moreIndicatorGenerator={newMessageGenerator}
                 />
             );
 

@@ -42,7 +42,7 @@
         "file-loader": "^1.1.5",
         "html-webpack-plugin": "^2.30.1",
         "pepjs": "^0.4.3",
-        "performance-scroll-view": "https://github.com/gdnmobilelab/performance-scroll-view.git",
+        "performance-scroll-view": "git+https://github.com/gdnmobilelab/performance-scroll-view.git",
         "photoswipe": "^4.1.2",
         "pushkin-client": "https://github.com/gdnmobilelab/pushkin-client.git",
         "range-parser": "^1.2.0",

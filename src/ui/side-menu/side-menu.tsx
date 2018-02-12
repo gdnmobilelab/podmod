@@ -43,7 +43,7 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
 
     render() {
         let containerStyles = styles.sideMenuContainer;
-        if (this.state.opened || 1 == 1) {
+        if (this.state.opened) {
             containerStyles += " " + styles.openedContainer;
         }
 

@@ -79,3 +79,30 @@
     height: 100%;
     border-radius: 50%;
 }
+
+@keyframes slidein {
+    from {
+        transform: translate3d(-50%, 100px, 0);
+    }
+
+    to {
+        transform: translate3d(-50%, 0, 0);
+    }
+}
+
+.more-messages {
+    background: #579396;
+    color: #fff;
+    font-family: "Guardian Sans Web";
+    /* margin: 0 auto 30px; */
+    padding: 10px 25px;
+    border-radius: 10px;
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translate3d(-50%, 0, 0);
+    cursor: pointer;
+    animation-name: slidein;
+    animation-duration: 0.2s;
+    box-shadow: 4px 4px 5px 0px rgba(0, 0, 0, 0.1);
+}
