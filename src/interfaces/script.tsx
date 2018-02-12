@@ -103,7 +103,8 @@ function mapScriptEntry(response: ChatBubbleProperties, index: number, baseURL: 
                 url: url.href,
                 domain: url.hostname,
                 image: imageURL,
-                title: response.link.title
+                title: response.link.title,
+                specialAction: response.link.specialAction
             }
         };
 

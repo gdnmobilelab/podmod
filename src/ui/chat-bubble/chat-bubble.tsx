@@ -4,6 +4,8 @@ import { Component } from "react";
 import { getPhotoSwipeContainer, PhotoSwipe } from "../photoswipe/photoswipe";
 import { runServiceWorkerCommand } from "service-worker-command-bridge";
 import { Chapter, makeRelative } from "../../interfaces/script";
+import { showOrHideContactBox } from "../contact-box/contact-box";
+import { showOrHideSideMenu } from "../side-menu/side-menu";
 
 export enum BubbleType {
     text = "text"
@@ -22,6 +24,7 @@ export interface ChatBubbleLink {
     url: string;
     image?: string;
     domain: string;
+    specialAction?: string;
 }
 
 export interface ChatBubbleProperties {
@@ -139,6 +142,21 @@ function renderText(bindTo: ChatBubble) {
 function renderLink(props: ChatBubbleProperties) {
     if (!props.link) {
         return null;
+    }
+    if (props.link.specialAction === "open-contact-menu") {
+        return (
+            <div onClick={showOrHideContactBox} className={styles.bubbleText + " " + styles.bubbleLink}>
+                {props.link.title}
+            </div>
+        );
+    }
+
+    if (props.link.specialAction === "open-side-menu") {
+        return (
+            <div onClick={showOrHideSideMenu} className={styles.bubbleText + " " + styles.bubbleLink}>
+                {props.link.title}
+            </div>
+        );
     }
 
     // let linkImage: JSX.Element | undefined;

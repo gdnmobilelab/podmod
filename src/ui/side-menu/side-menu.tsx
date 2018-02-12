@@ -2,17 +2,16 @@ import * as styles from "./side-menu.css";
 import * as React from "react";
 import { Script } from "../../interfaces/script";
 import { checkIfSubscribed, subscribe, unsubscribe } from "../../util/subscription";
-import { ContactBox } from "../contact-box/contact-box";
 import { makeRelative } from "../../interfaces/script";
 
 interface SideMenuState {
     opened: boolean;
     subscribed: SubscribeState;
-    contactBoxOpened: boolean;
 }
 
 interface SideMenuProps {
     script?: Script;
+    toggleContactBox: () => void;
 }
 
 interface Episode {
@@ -29,13 +28,14 @@ enum SubscribeState {
 
 const SUBSCRIPTION_TOPIC = "mona_podcast";
 
+export let showOrHideSideMenu: () => void;
+
 export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
     constructor(props) {
         super(props);
         this.state = {
             opened: false,
-            subscribed: SubscribeState.Unknown,
-            contactBoxOpened: false
+            subscribed: SubscribeState.Unknown
         };
         this.setAndStopPropagation = this.setAndStopPropagation.bind(this);
         this.toggleSubscriptionState = this.toggleSubscriptionState.bind(this);
@@ -47,19 +47,12 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
             containerStyles += " " + styles.openedContainer;
         }
 
-        let contactBox: JSX.Element | null = null;
-
-        if (this.state.contactBoxOpened) {
-            contactBox = <ContactBox onClose={() => this.setState({ contactBoxOpened: false })} />;
-        }
-
         return (
             <div
                 className={containerStyles}
                 onClick={() => this.setState({ opened: false })}
                 onTouchMove={e => e.stopPropagation()}
             >
-                {contactBox}
                 <button
                     className={styles.openerButton}
                     onClick={e => this.setAndStopPropagation(e, { opened: true })}
@@ -79,10 +72,7 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
                         {this.renderEpisodeNavigator()}
                         <h4>Ask Mona a Data Question</h4>
                         <p>Contact Mona by X, Y, Z</p>
-                        <button
-                            className={styles.subscribeButton}
-                            onClick={() => this.setState({ contactBoxOpened: true })}
-                        >
+                        <button className={styles.subscribeButton} onClick={this.props.toggleContactBox}>
                             Ask Mona a Question
                         </button>
                         <h4>Give Feedback</h4>
@@ -253,6 +243,11 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
     }
 
     async componentDidMount() {
+        showOrHideSideMenu = () => {
+            this.setState({
+                opened: !this.state.opened
+            });
+        };
         if ("Notification" in window && "serviceWorker" in navigator) {
             let isSubscribed = await checkIfSubscribed(SUBSCRIPTION_TOPIC);
 

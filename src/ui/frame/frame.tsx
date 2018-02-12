@@ -19,6 +19,7 @@ import { fontsLoaded } from "../../util/fonts";
 import { TimeFormatter } from "../time-formatter/time-formatter";
 import { NotificationRequestResult } from "../../interfaces/notification";
 import { setNotificationEnableState, getNotificationEnableState } from "../../util/notification-dispatch";
+import { ContactBox, setShowOrHideFunction } from "../contact-box/contact-box";
 
 declare var FontFaceSet: any;
 
@@ -45,6 +46,7 @@ interface PlayerState {
     showNotifications: boolean;
     downloadOffline: boolean;
     buffering: boolean;
+    showContactWindow: boolean;
 }
 
 interface PlayerProps {
@@ -62,11 +64,13 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
             bottomSliderExpanded: false,
             showNotifications: false,
             downloadOffline: false,
-            buffering: false
+            buffering: false,
+            showContactWindow: false
         };
         this.timeUpdate = this.timeUpdate.bind(this);
         this.playStateChange = this.playStateChange.bind(this);
         this.audioProgress = this.audioProgress.bind(this);
+        this.toggleContactWindow = this.toggleContactWindow.bind(this);
     }
 
     async loadData() {
@@ -106,6 +110,12 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
         );
     }
 
+    toggleContactWindow() {
+        this.setState({
+            showContactWindow: !this.state.showContactWindow
+        });
+    }
+
     render() {
         let loadedPercent = 0;
         let playbackPercent = 0;
@@ -122,8 +132,13 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
 
         let audio: JSX.Element | null = null;
         let dingElement: JSX.Element | null = null;
+        let contactBox: JSX.Element | null = null;
 
         let chapterMarks: number[] = [];
+
+        if (this.state.showContactWindow) {
+            contactBox = <ContactBox onClose={this.toggleContactWindow} />;
+        }
 
         if (this.state.script) {
             duration = this.state.script.metadata.length;
@@ -227,7 +242,8 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                         onNotificationPermissionChange={() => {}}
                     />
                 </BottomSlider>
-                <SideMenu script={this.state.script} />
+                {contactBox}
+                <SideMenu script={this.state.script} toggleContactBox={this.toggleContactWindow} />
             </div>
         );
     }
@@ -338,6 +354,9 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                 throw ex;
             }
         }
+
+        // hackidy hack
+        setShowOrHideFunction(this.toggleContactWindow);
 
         this.loadData();
 
