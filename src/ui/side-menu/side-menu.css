@@ -59,7 +59,7 @@
     pointer-events: auto;
     z-index: 3;
     background: transparent;
-    background-image: url('data:image/svg+xml;utf8,<svg width="70" height="48" viewBox="0 0 70 48" xmlns="http://www.w3.org/2000/svg"><title>menu-button</title><g fill="#F7B300" fill-rule="evenodd"><path d="M0 0h72v8H0zM0 20h72v8H0zM0 40h72v8H0z"/></g></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg width="70" height="48" viewBox="0 0 70 48" xmlns="http://www.w3.org/2000/svg"><title>menu-button</title><g fill="%23F7B300" fill-rule="evenodd"><path d="M0 0h72v8H0zM0 20h72v8H0zM0 40h72v8H0z"/></g></svg>');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     border: none;
@@ -81,7 +81,7 @@
 }
 
 .closer-button {
-    background-image: url('data:image/svg+xml;utf8,<svg width="55" height="53" viewBox="0 0 55 53" xmlns="http://www.w3.org/2000/svg"><title>close-button</title><g stroke="#F5B227" stroke-width="4" fill="none" fill-rule="evenodd" stroke-linecap="round"><path d="M50 4L4.9 49.1M4 4l45.1 45.1"/></g></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg width="55" height="53" viewBox="0 0 55 53" xmlns="http://www.w3.org/2000/svg"><title>close-button</title><g stroke="%23F5B227" stroke-width="4" fill="none" fill-rule="evenodd" stroke-linecap="round"><path d="M50 4L4.9 49.1M4 4l45.1 45.1"/></g></svg>');
 }
 
 .side-menu h4 {
@@ -118,7 +118,7 @@
 }
 
 .episodeEntryWithArrow {
-    background-image: url('data:image/svg+xml;utf8,<svg width="23" height="45" viewBox="0 0 23 45" xmlns="http://www.w3.org/2000/svg"><title>right-arrow</title><path d="M3 41.353l16.74-19.176L3 3" stroke-width="4" stroke="#F5B227" fill="none" fill-rule="evenodd" stroke-linecap="round"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg width="23" height="45" viewBox="0 0 23 45" xmlns="http://www.w3.org/2000/svg"><title>right-arrow</title><path d="M3 41.353l16.74-19.176L3 3" stroke-width="4" stroke="%23F5B227" fill="none" fill-rule="evenodd" stroke-linecap="round"/></svg>');
     background-size: auto 60%;
     background-position: 96% center;
     background-repeat: no-repeat;
