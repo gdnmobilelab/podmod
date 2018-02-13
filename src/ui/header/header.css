@@ -67,7 +67,7 @@
 .header-interior {
     background-color: #f5f2f0;
     position: absolute;
-    height: 134px;
+    height: 154px;
     width: 100%;
     z-index: 2;
     overflow: hidden;
@@ -79,6 +79,7 @@
 
 .header-expand .header-interior {
     transform: translateY(-0);
+    height: 134px;
 }
 
 .header h1 {
