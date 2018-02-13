@@ -39,10 +39,10 @@ async function playInFull(el: HTMLAudioElement) {
     let { promise, fulfill } = new PendingPromise<Event>();
 
     el.addEventListener("ended", fulfill);
-    el.currentTime = 0;
     el.play();
 
     await promise;
+    el.currentTime = 0;
     el.removeEventListener("ended", fulfill);
 }
 
@@ -52,16 +52,28 @@ export let activeDing: Ding | undefined;
 export class Ding extends React.Component<DingProps, any> {
     dingAudioElement: HTMLAudioElement | null;
 
+    shouldPlayDings: boolean = true;
+
     constructor(props) {
         super(props);
         this.activateAudioElement = this.activateAudioElement.bind(this);
     }
 
     render() {
-        return <audio src={this.props.audioURL} ref={el => (this.dingAudioElement = el)} />;
+        return (
+            <audio
+                src={this.props.audioURL}
+                loop={false}
+                ref={el => (this.dingAudioElement = el)}
+                preload="auto"
+            />
+        );
     }
 
     async ding() {
+        if (this.shouldPlayDings === false) {
+            return;
+        }
         console.info("DING: dinging");
         if (!this.dingAudioElement) {
             throw new Error("Tried to play 'ding' element, but it didn't exist");
@@ -98,6 +110,7 @@ export class Ding extends React.Component<DingProps, any> {
         this.dingAudioElement.volume = 0;
         await this.dingAudioElement.play();
         this.dingAudioElement.pause();
+        // this.dingAudioElement.currentTime = 0;
         this.dingAudioElement.volume = 1;
     }
 }

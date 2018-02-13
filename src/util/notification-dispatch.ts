@@ -1,4 +1,4 @@
-import { ShowNotification } from "../interfaces/notification";
+import { ShowNotification, RunCommand, RemoveNotificationOptions } from "worker-commands";
 import { runServiceWorkerCommand } from "service-worker-command-bridge";
 
 let sendNotifications = false;
@@ -17,11 +17,17 @@ export async function sendNotification(opts: ShowNotification) {
         console.info(`Suppressing notification with title ${opts.title}...`);
         return;
     }
-    await runServiceWorkerCommand<ShowNotification, void>("show-notification", opts);
+    await runServiceWorkerCommand<RunCommand<ShowNotification>, void>("fire-worker-command", {
+        command: "notification.show",
+        options: opts
+    });
 }
 
 export async function removeNotification(uuid: string) {
-    runServiceWorkerCommand<any, void>("remove-notification", {
-        uuid
+    await runServiceWorkerCommand<RunCommand<RemoveNotificationOptions>, void>("fire-worker-command", {
+        command: "notification.close",
+        options: {
+            tag: uuid
+        }
     });
 }

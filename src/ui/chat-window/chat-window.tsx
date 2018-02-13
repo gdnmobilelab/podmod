@@ -4,6 +4,7 @@ import * as styles from "./chat-window.css";
 import { PerformanceScrollView, AddNewItemsTo } from "performance-scroll-view";
 import { ChatBubble, ChatBubbleProperties } from "../chat-bubble/chat-bubble";
 import { Script } from "../../interfaces/script";
+import { activeDing } from "../ding/ding";
 
 interface ChatWindowState {
     numberOfVisibleItems: number;
@@ -13,6 +14,7 @@ interface ChatWindowProps {
     script?: Script;
     elements?: JSX.Element[];
     currentTime: number;
+    playDings: boolean;
 }
 
 function easeOutBack(t: number, b: number, c: number, d: number, s: number = 0) {
@@ -20,6 +22,16 @@ function easeOutBack(t: number, b: number, c: number, d: number, s: number = 0) 
         s = 1.70158;
     }
     return c * ((t = t / d - 1) * t * ((s + 1) * t + s) + 1) + b;
+}
+
+function newMessageGenerator(numberOfMessages: number) {
+    let messagesText = numberOfMessages > 1 ? "messages" : "message";
+
+    return (
+        <div className={styles.moreMessages}>
+            {numberOfMessages} new {messagesText}
+        </div>
+    );
 }
 
 export class ChatWindow extends React.Component<ChatWindowProps, ChatWindowState> {
@@ -53,6 +65,10 @@ export class ChatWindow extends React.Component<ChatWindowProps, ChatWindowState
             // if we don't have a script yet, ignore
             return;
         }
+        if (activeDing) {
+            activeDing.shouldPlayDings = newProps.playDings;
+        }
+
         let timeChange = newProps.currentTime !== this.props.currentTime;
         let scriptChange = newProps.script !== this.props.script;
 
@@ -101,13 +117,14 @@ export class ChatWindow extends React.Component<ChatWindowProps, ChatWindowState
                 <PerformanceScrollView
                     className={styles.chat + " chat-window"}
                     numberOfItems={this.state.numberOfVisibleItems}
-                    itemBufferSize={20}
+                    itemBufferSize={21}
                     itemGenerator={this.generateItem}
                     addNewItemsTo={AddNewItemsTo.Bottom}
                     animationEaseFunction={easeOutBack}
                     animationDuration={750}
                     startIndex={this.state.numberOfVisibleItems - 1}
                     ref={el => (this.scrollView = el)}
+                    moreIndicatorGenerator={newMessageGenerator}
                 />
             );
 
@@ -124,7 +141,7 @@ export class ChatWindow extends React.Component<ChatWindowProps, ChatWindowState
             );
         }
         return (
-            <div className={styles.chatContainer}>
+            <div className={styles.chatContainer} onTouchMove={e => e.stopPropagation()}>
                 {innerView}
                 {avatar}
             </div>

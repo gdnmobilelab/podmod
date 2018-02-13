@@ -7,9 +7,37 @@ export async function checkIfSubscribed(topicName: string) {
     return topics.indexOf(topicName) > -1;
 }
 
+const BADGE_URL = new URL("./bundles/mona-ep-1/lab_badge.png", self.location.href).href;
+const ICON_URL = new URL("./bundles/mona-ep-1/podcast_thumb.jpg", self.location.href).href;
+
 export async function subscribe(topicName: string) {
     await runServiceWorkerCommand<SubscribeOptions, any>("push-subscribe", {
-        topic: topicName
+        topic: topicName,
+        confirmationPayload: {
+            __workerCommandPayload: {
+                command: "notification.show",
+                options: {
+                    title: "You are subscribed",
+                    body: "We'll send you a notification like this when a new episode is published.",
+                    badge: BADGE_URL,
+                    icon: ICON_URL,
+                    events: {
+                        onclick: [
+                            {
+                                command: "clients.focus"
+                            },
+                            {
+                                command: "notification.close"
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        confirmationIOS: {
+            title: "__",
+            body: "__"
+        }
     });
 }
 

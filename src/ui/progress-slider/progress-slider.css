@@ -15,6 +15,7 @@
     /* Add this so it goes to the edges of the screen */
     left: -10px;
     padding: 0 10px;
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 .so-far-bar {

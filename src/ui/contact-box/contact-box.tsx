@@ -5,9 +5,19 @@ interface ContactBoxProps {
     onClose: () => void;
 }
 
+export function setShowOrHideFunction(func: () => void) {
+    showOrHideContactBox = func;
+}
+
+export let showOrHideContactBox: () => void;
+
 export function ContactBox(props: ContactBoxProps) {
+    // total hack shortcut to show/hide window
+
     return (
-        <div style={{ pointerEvents: "auto" }}>
+        <div
+            style={{ pointerEvents: "auto", position: "absolute", width: "100%", height: "100%", zIndex: 11 }}
+        >
             <div
                 className={styles.contactBoxBack}
                 onClick={e => {
@@ -23,9 +33,9 @@ export function ContactBox(props: ContactBoxProps) {
                 </p>
                 <ul>
                     <li>
-                        <a href="tel:+19175555555">Leave a voicemail</a>
-                        <a href="sms:+19175555555">Send a text message</a>
-                        <a href="mailto:an@email.address">Write an e-mail</a>
+                        <a href="tel:+15038327563">Leave a voicemail</a>
+                        <a href="sms:+15038327563">Send a text message</a>
+                        <a href="mailto:strangebird@theguardian.com">Write an e-mail</a>
                     </li>
                 </ul>
             </div>

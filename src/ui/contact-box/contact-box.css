@@ -21,10 +21,10 @@
 
 .contact-box {
     background: #fff;
-    width: 80vw;
+    width: 80%;
     position: absolute;
     top: 50%;
-    left: 10vw;
+    left: 10%;
     padding: 20px;
     box-sizing: border-box;
     transform: translateY(-50%);

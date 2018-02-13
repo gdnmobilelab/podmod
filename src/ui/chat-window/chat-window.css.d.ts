@@ -6,3 +6,5 @@ export const moreButton: string;
 export const moreButtonSlideIn: string;
 export const avatar: string;
 export const avatarInner: string;
+export const moreMessages: string;
+export const slidein: string;

@@ -1,4 +1,4 @@
-import { ShowNotification } from "./interfaces/notification";
+// import { ShowNotification } from "./interfaces/notification";
 // import { WorkerBridge } from "./bridge/worker-bridge";
 import { NotificationBridge, NotificationBridgeInstance } from "./bridge/notification";
 import { CacheSync } from "./io/cache-sync";
@@ -13,6 +13,8 @@ import {
     SubscribeOptions,
     UnsubscribeOptions
 } from "pushkin-client";
+
+import { fireCommand, ShowNotification, RunCommand, setup, registerCommand } from "worker-commands";
 
 declare var self: ServiceWorkerGlobalScope;
 
@@ -96,21 +98,14 @@ self.addEventListener("fetch", (e: FetchEvent) => {
 // });
 
 CommandListener.listen();
+setup();
 
 // self.addEventListener("message", e => {
 //     console.log("GOT MESSAGE");
 // });
 
-CommandListener.bind("show-notification", (n: ShowNotification) => {
-    console.log("SHOW THIS?", n);
-    self.registration.showNotification(n.title, {
-        icon: n.icon,
-        body: n.body,
-        data: n.data,
-        badge: n.badge,
-        actions: n.actions,
-        image: n.image
-    } as any);
+CommandListener.bind("fire-worker-command", (c: RunCommand<any>) => {
+    return fireCommand(c);
 });
 
 CommandListener.bind("get-notifications", async (n: ShowNotification) => {
@@ -125,37 +120,29 @@ CommandListener.bind("get-notifications", async (n: ShowNotification) => {
     });
 });
 
-CommandListener.bind("remove-notification", async (predicate: any) => {
-    let notifications = (await self.registration.getNotifications()) as Notification[];
-    notifications.forEach(notification => {
-        for (let key in predicate) {
-            if (predicate[key] !== (notification as any).data[key]) {
-                return;
-            }
-        }
-        notification.close();
-    });
-});
-
-async function focusWindowIfExists() {
-    let allClients = await self.clients.matchAll();
-    if (allClients.length === 0) {
-        console.warn("Tried to focus browser window but there was none");
-        return;
-    }
-    (allClients[0] as WindowClient).focus();
+interface ShowPhotoRequest {
+    url: string;
 }
 
-self.addEventListener("notificationclick", e => {
-    console.log("NOTIFY HIT");
-    e.notification.close();
+registerCommand("podmod.openphoto", async (opts: ShowPhotoRequest) => {
+    let clients = await self.clients.matchAll();
 
-    if (e.action === "open-link") {
-        self.clients.openWindow((e.notification as any).data.link_url);
-        return;
-    }
+    clients.forEach(c =>
+        c.postMessage({
+            command: "podmod.openphoto",
+            url: opts.url
+        })
+    );
+});
 
-    e.waitUntil(focusWindowIfExists());
+registerCommand("podmod.closephoto", async () => {
+    let clients = await self.clients.matchAll();
+
+    clients.forEach(c =>
+        c.postMessage({
+            command: "podmod.closephoto"
+        })
+    );
 });
 
 setConfig({
@@ -163,7 +150,13 @@ setConfig({
     host: PUSHKIN_HOST
 });
 
-CommandListener.bind("get-subscribed-topics", getSubscribedTopics);
+CommandListener.bind("get-subscribed-topics", () => {
+    console.info("WORKER: getting subscribed topics from pushkin");
+    return getSubscribedTopics().then(topics => {
+        console.log("got topics!", topics);
+        return topics;
+    });
+});
 CommandListener.bind("push-subscribe", (opts: SubscribeOptions) => {
     return subscribeToTopic(opts);
 });

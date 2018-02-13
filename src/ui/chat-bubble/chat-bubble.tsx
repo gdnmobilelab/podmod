@@ -3,8 +3,9 @@ import * as React from "react";
 import { Component } from "react";
 import { getPhotoSwipeContainer, PhotoSwipe } from "../photoswipe/photoswipe";
 import { runServiceWorkerCommand } from "service-worker-command-bridge";
-import { ShowNotification } from "../../interfaces/notification";
 import { Chapter, makeRelative } from "../../interfaces/script";
+import { showOrHideContactBox } from "../contact-box/contact-box";
+import { showOrHideSideMenu } from "../side-menu/side-menu";
 
 export enum BubbleType {
     text = "text"
@@ -23,6 +24,7 @@ export interface ChatBubbleLink {
     url: string;
     image?: string;
     domain: string;
+    specialAction?: string;
 }
 
 export interface ChatBubbleProperties {
@@ -32,6 +34,7 @@ export interface ChatBubbleProperties {
     link?: ChatBubbleLink;
     chapterIndicator?: Chapter;
     silent?: boolean;
+    notificationOnlyText?: string;
 }
 
 interface ChatBubbleState {
@@ -140,6 +143,21 @@ function renderLink(props: ChatBubbleProperties) {
     if (!props.link) {
         return null;
     }
+    if (props.link.specialAction === "open-contact-menu") {
+        return (
+            <div onClick={showOrHideContactBox} className={styles.bubbleText + " " + styles.bubbleLink}>
+                {props.link.title}
+            </div>
+        );
+    }
+
+    if (props.link.specialAction === "open-side-menu") {
+        return (
+            <div onClick={showOrHideSideMenu} className={styles.bubbleText + " " + styles.bubbleLink}>
+                {props.link.title}
+            </div>
+        );
+    }
 
     // let linkImage: JSX.Element | undefined;
     // if (props.link.image) {
@@ -177,6 +195,8 @@ export class ChatBubble extends Component<ChatBubbleProperties, ChatBubbleState>
             touched: false,
             expanded: false
         };
+        this.maybeOpenPhotoSwipe = this.maybeOpenPhotoSwipe.bind(this);
+        this.maybeClosePhotoSwipe = this.maybeClosePhotoSwipe.bind(this);
     }
 
     render() {
@@ -220,6 +240,30 @@ export class ChatBubble extends Component<ChatBubbleProperties, ChatBubbleState>
         );
     }
 
+    maybeOpenPhotoSwipe(e: ServiceWorkerMessageEvent) {
+        if (e.data.command !== "podmod.openphoto") {
+            return;
+        }
+        if (e.data.url !== this.props.images![0].url) {
+            return;
+        }
+
+        this.setState({
+            expanded: true
+        });
+    }
+
+    maybeClosePhotoSwipe(e: ServiceWorkerMessageEvent) {
+        console.log("FIRING LISTENER");
+        if (e.data.command !== "podmod.closephoto" || this.state.expanded === false) {
+            return;
+        }
+        console.info("Closing photo in response to postMessage");
+        this.setState({
+            expanded: false
+        });
+    }
+
     componentDidMount() {
         if (this.textElement && this.containerElement) {
             // If it's just a text bubble it doesn't automatically change width according to the size
@@ -227,45 +271,29 @@ export class ChatBubble extends Component<ChatBubbleProperties, ChatBubbleState>
             // this.containerElement.style.width = this.textElement.getBoundingClientRect().width + "px";
         }
 
-        // if (document.visibilityState === "visible") {
-        //     // If the user is currently on the page we don't show these notifications
-        //     return;
-        // }
+        if (this.props.images && this.props.images.length > 0 && "serviceWorker" in navigator) {
+            window.navigator.serviceWorker.addEventListener("message", this.maybeOpenPhotoSwipe);
+        }
+    }
 
-        // if (this.props.chapterIndicator) {
-        //     // We don't show notifications for chapter changes
-        //     return;
-        // }
+    componentWillUnmount() {
+        if (this.props.images && this.props.images.length > 0 && "serviceWorker" in navigator) {
+            window.navigator.serviceWorker.removeEventListener("message", this.maybeOpenPhotoSwipe);
+            window.navigator.serviceWorker.removeEventListener("message", this.maybeClosePhotoSwipe);
+        }
+    }
 
-        // let notificationOptions: ShowNotification = {
-        //     title: "Mona from the Guardian",
-        //     icon: makeRelative("./bundles/mona-ep-1/mona-headshot-round.png", window.location.href),
-        //     body: this.props.text,
-        //     badge: "https://www.gdnmobilelab.com/uk-election-2017/images/gdn_badge.png",
-        //     data: {
-        //         uuid: this.state.uuid
-        //     }
-        // };
-
-        // if (this.props.images && this.props.images.length > 0) {
-        //     notificationOptions.image = makeRelative(this.props.images[0].url, window.location.href);
-        // }
-
-        // if (this.props.link) {
-        //     notificationOptions.body = this.props.link.domain;
-        //     notificationOptions.actions = [
-        //         {
-        //             action: "open-link",
-        //             title: "Open Link"
-        //         }
-        //     ];
-        // }
-
-        // runServiceWorkerCommand<ShowNotification, void>("show-notification", notificationOptions).catch(
-        //     err => {
-        //         console.error(err);
-        //     }
-        // );
+    componentDidUpdate(oldProps, oldState: ChatBubbleState) {
+        if (!this.props.images || this.props.images.length === 0 || "serviceWorker" in navigator === false) {
+            return;
+        }
+        if (oldState.expanded === false && this.state.expanded === true) {
+            console.log("SETTING LISTENER");
+            window.navigator.serviceWorker.addEventListener("message", this.maybeClosePhotoSwipe);
+        } else if (oldState.expanded === true && this.state.expanded === false) {
+            console.log("REMOVING LISTENER");
+            window.navigator.serviceWorker.removeEventListener("message", this.maybeClosePhotoSwipe);
+        }
     }
 
     setTouch(e: React.TouchEvent<HTMLDivElement>) {

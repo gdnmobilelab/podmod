@@ -13,12 +13,13 @@ import { StartButton } from "../start-button/start-button";
 import { ProgressSlider } from "../progress-slider/progress-slider";
 import { SideMenu } from "../side-menu/side-menu";
 import { BottomSlider } from "../bottom-slider/bottom-slider";
-import { Ding } from "../ding/ding";
+import { Ding, activeDing } from "../ding/ding";
 import { BottomInfo } from "../bottom-info/bottom-info";
 import { fontsLoaded } from "../../util/fonts";
 import { TimeFormatter } from "../time-formatter/time-formatter";
 import { NotificationRequestResult } from "../../interfaces/notification";
 import { setNotificationEnableState, getNotificationEnableState } from "../../util/notification-dispatch";
+import { ContactBox, setShowOrHideFunction } from "../contact-box/contact-box";
 
 declare var FontFaceSet: any;
 
@@ -36,6 +37,7 @@ interface PlayerState {
     playback?: {
         current: number;
         total: number;
+        manuallyScrubbed: boolean;
     };
     playState: PlayState;
     script?: Script;
@@ -44,6 +46,8 @@ interface PlayerState {
     bottomSliderExpanded: boolean;
     showNotifications: boolean;
     downloadOffline: boolean;
+    buffering: boolean;
+    showContactWindow: boolean;
 }
 
 interface PlayerProps {
@@ -60,11 +64,14 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
             playState: PlayState.Paused,
             bottomSliderExpanded: false,
             showNotifications: false,
-            downloadOffline: false
+            downloadOffline: false,
+            buffering: false,
+            showContactWindow: false
         };
         this.timeUpdate = this.timeUpdate.bind(this);
         this.playStateChange = this.playStateChange.bind(this);
         this.audioProgress = this.audioProgress.bind(this);
+        this.toggleContactWindow = this.toggleContactWindow.bind(this);
     }
 
     async loadData() {
@@ -78,6 +85,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
             json.baseURL = new URL(".", absoluteURL.href).href;
             json.assets = json.assets.map(url => makeRelative(url, absoluteURL.href));
             json.dingFile = makeRelative(json.dingFile, absoluteURL.href);
+            json.metadata.artwork = makeRelative(json.metadata.artwork, absoluteURL.href);
             return json;
         }
 
@@ -103,6 +111,12 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
         );
     }
 
+    toggleContactWindow() {
+        this.setState({
+            showContactWindow: !this.state.showContactWindow
+        });
+    }
+
     render() {
         let loadedPercent = 0;
         let playbackPercent = 0;
@@ -119,8 +133,13 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
 
         let audio: JSX.Element | null = null;
         let dingElement: JSX.Element | null = null;
+        let contactBox: JSX.Element | null = null;
 
         let chapterMarks: number[] = [];
+
+        if (this.state.showContactWindow) {
+            contactBox = <ContactBox onClose={this.toggleContactWindow} />;
+        }
 
         if (this.state.script) {
             duration = this.state.script.metadata.length;
@@ -129,10 +148,19 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                 <audio
                     src={this.state.script.audioFile}
                     preload="auto"
-                    onProgress={this.audioProgress}
+                    // controls
+                    // onProgress={this.audioProgress}
                     onTimeUpdate={this.timeUpdate}
                     onPlay={this.playStateChange}
                     onPause={this.playStateChange}
+                    onWaiting={() => this.setState({ buffering: true })}
+                    // onPlaying={() => this.setState({ buffering: false })}
+                    // onError={err => console.warn("error", err.nativeEvent)}
+                    // onAbort={() => console.warn("abort!")}
+                    // onEnded={() => console.warn("ended!")}
+                    // onStalled={() => console.warn("stalled!")}
+                    onLoadStart={() => this.setState({ buffering: true })}
+                    onCanPlayThrough={() => this.setState({ buffering: false })}
                     title={this.state.currentChapterName}
                     style={{ position: "absolute", zIndex: 100 }}
                     ref={el => (this.audioElement = el as HTMLAudioElement)}
@@ -151,7 +179,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
         // (this.state.playState === PlayState.Paused && this.state.playback.current === 0);
 
         return (
-            <div className={styles.frame}>
+            <div className={styles.frame} onTouchMove={e => e.preventDefault()}>
                 {audio}
                 {dingElement}
                 <Header
@@ -163,6 +191,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                     currentTime={this.state.playback ? this.state.playback.current : 0}
                     elements={this.state.scriptElements}
                     ref={el => (this.chatWindow = el)}
+                    playDings={this.state.playback ? !this.state.playback.manuallyScrubbed : true}
                 />
                 <BottomSlider
                     className={styles.controls}
@@ -188,7 +217,9 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                             time={this.state.playback ? this.state.playback.current : 0}
                             className={styles.timeBlock}
                         />
-                        <div className={styles.currentChapterName}>{this.state.currentChapterName}</div>
+                        <div className={styles.currentChapterName}>
+                            {this.state.buffering ? "Buffering..." : this.state.currentChapterName}
+                        </div>
                         <TimeFormatter
                             time={this.state.playback ? this.state.playback.total : undefined}
                             className={styles.timeBlock + " " + styles.timeLeft}
@@ -213,7 +244,12 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                         onNotificationPermissionChange={() => {}}
                     />
                 </BottomSlider>
-                <SideMenu script={this.state.script} />
+                {contactBox}
+                <SideMenu
+                    script={this.state.script}
+                    toggleContactBox={this.toggleContactWindow}
+                    isPlaying={this.state.playback !== undefined}
+                />
             </div>
         );
     }
@@ -232,13 +268,14 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
 
     play() {
         this.nextSecondTimeout = undefined;
-        this.audioElement.play();
+        this.audioElement.play().catch(console.error);
         sendEvent("Web browser", "Play", "TO BE ADDED");
         if (!this.state.playback) {
             this.setState({
                 playback: {
-                    current: 0,
-                    total: -1
+                    current: 0.1,
+                    total: -1,
+                    manuallyScrubbed: false
                 }
             });
         }
@@ -300,7 +337,8 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
         this.setState({
             playback: {
                 total: this.audioElement.duration,
-                current: this.audioElement.currentTime
+                current: this.audioElement.currentTime,
+                manuallyScrubbed: true
             }
         });
     }
@@ -324,6 +362,9 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                 throw ex;
             }
         }
+
+        // hackidy hack
+        setShowOrHideFunction(this.toggleContactWindow);
 
         this.loadData();
 
@@ -360,7 +401,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
         let nextSecond = Math.ceil(currentTime);
         let untilNextSecond = nextSecond - currentTime;
 
-        if (this.nextSecondTimeout) {
+        if (this.nextSecondTimeout || this.audioElement.paused === true) {
             return;
         }
         this.nextSecondTimeout = setTimeout(() => {
@@ -378,7 +419,8 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
             this.setState({
                 playback: {
                     current: nextSecond,
-                    total: this.audioElement.duration
+                    total: this.audioElement.duration,
+                    manuallyScrubbed: false
                 },
                 currentChapterName: chapterName
             });
@@ -449,7 +491,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
             title: this.state.currentChapterName,
             artist: "The Guardian",
             album: this.state.script.metadata.title,
-            artwork: [{ src: "./bundles/mona-ep-1/pee_thumb.png", sizes: "325x333", type: "image/png" }]
+            artwork: [{ src: this.state.script.metadata.artwork, sizes: "3001x3001", type: "image/jpg" }]
         });
     }
 }

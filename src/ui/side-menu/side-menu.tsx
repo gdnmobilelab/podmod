@@ -2,16 +2,17 @@ import * as styles from "./side-menu.css";
 import * as React from "react";
 import { Script } from "../../interfaces/script";
 import { checkIfSubscribed, subscribe, unsubscribe } from "../../util/subscription";
-import { ContactBox } from "../contact-box/contact-box";
+import { makeRelative } from "../../interfaces/script";
 
 interface SideMenuState {
     opened: boolean;
     subscribed: SubscribeState;
-    contactBoxOpened: boolean;
 }
 
 interface SideMenuProps {
     script?: Script;
+    toggleContactBox: () => void;
+    isPlaying: boolean;
 }
 
 interface Episode {
@@ -28,14 +29,24 @@ enum SubscribeState {
 
 const SUBSCRIPTION_TOPIC = "mona_podcast";
 
+export let showOrHideSideMenu: () => void;
+
 export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
     constructor(props) {
         super(props);
-        this.state = {
+        let state = {
             opened: false,
-            subscribed: SubscribeState.Unknown,
-            contactBoxOpened: false
+            subscribed: SubscribeState.Unknown
         };
+
+        if ("Notification" in window && (Notification as any).permission === "default") {
+            // We can't request subscription details without getting notification
+            // permission first, so we don't check
+            state.subscribed = SubscribeState.Unsubscribed;
+        }
+
+        this.state = state;
+
         this.setAndStopPropagation = this.setAndStopPropagation.bind(this);
         this.toggleSubscriptionState = this.toggleSubscriptionState.bind(this);
     }
@@ -46,15 +57,12 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
             containerStyles += " " + styles.openedContainer;
         }
 
-        let contactBox: JSX.Element | null = null;
-
-        if (this.state.contactBoxOpened) {
-            contactBox = <ContactBox onClose={() => this.setState({ contactBoxOpened: false })} />;
-        }
-
         return (
-            <div className={containerStyles} onClick={() => this.setState({ opened: false })}>
-                {contactBox}
+            <div
+                className={containerStyles}
+                onClick={() => this.setState({ opened: false })}
+                onTouchMove={e => e.stopPropagation()}
+            >
                 <button
                     className={styles.openerButton}
                     onClick={e => this.setAndStopPropagation(e, { opened: true })}
@@ -68,19 +76,78 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
                     >
                         Close
                     </button>
+                    <div className={styles.topWing} />
                     <div className={styles.scroller}>
-                        <div className={styles.topWing} />
-
                         {this.renderEpisodeDetails()}
                         {this.renderEpisodeNavigator()}
                         <h4>Ask Mona a Data Question</h4>
                         <p>Contact Mona by X, Y, Z</p>
-                        <button
-                            className={styles.subscribeButton}
-                            onClick={() => this.setState({ contactBoxOpened: true })}
-                        >
-                            Ask Mona a Question
+                        <button className={styles.subscribeButton} onClick={this.props.toggleContactBox}>
+                            Ask Mona a question
                         </button>
+                        <h4>Give Feedback</h4>
+                        <p>
+                            Read about this experimental format here. We want to know what you think about the
+                            show.
+                        </p>
+                        <a
+                            target="_blank"
+                            href="https://goo.gl/forms/LO6GvPYWRfvR9rpv2"
+                            className={styles.subscribeButton}
+                        >
+                            Take a quick survey
+                        </a>
+                        <h4>The Team</h4>
+                        <ul className={styles.theTeam}>
+                            <li>
+                                <img
+                                    src={makeRelative(
+                                        "./bundles/mona-ep-1/mona-headshot-round.png",
+                                        window.location.href
+                                    )}
+                                />
+                                <div>
+                                    <p>
+                                        <em>Host</em>
+                                    </p>
+                                    <p>Mona Chalabi</p>
+                                    <p>Data Editor, The Guardian</p>
+                                </div>
+                            </li>
+                            <li>
+                                <img
+                                    src={makeRelative(
+                                        "./bundles/mona-ep-1/mona-headshot-round.png",
+                                        window.location.href
+                                    )}
+                                />
+                                <div>
+                                    <p>
+                                        <em>Producer</em>
+                                    </p>
+                                    <p>Josie Holtzman</p>
+                                    <p>Producer, Roads and Kingdoms</p>
+                                </div>
+                            </li>
+                            <li>
+                                <img
+                                    src={makeRelative(
+                                        "./bundles/mona-ep-1/gmil-logo.svg",
+                                        window.location.href
+                                    )}
+                                />
+                                <div>
+                                    <p>
+                                        <em>Concept &amp; Development</em>
+                                    </p>
+                                    <p>The Guardian Mobile Innovation Lab</p>
+                                </div>
+                            </li>
+                        </ul>
+                        <p className={styles.contactUs}>
+                            Contact us:{" "}
+                            <a href="mailto:innovationlab@theguardian.com">innovationlab@theguardian.com</a>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -114,26 +181,21 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
         let episodes: Episode[] = [];
 
         if (this.props.script) {
-            episodes.push({
+            let episode = {
                 name: this.props.script.metadata.episodeName,
                 id: this.props.script.episodeId,
-                status: "playing"
-            });
+                status: ""
+            };
+            if (episode.id === this.props.script.episodeId && this.props.isPlaying) {
+                episode.status = "playing";
+            }
+            episodes.push(episode);
         }
 
-        return (
-            <div>
-                <h4>Episodes</h4>
-                <ul className={styles.episodeList}>
-                    {episodes.map(episode => {
-                        return (
-                            <li className={styles.episodeEntry}>
-                                <span className={styles.episodeName}>{episode.name}</span>
-                                <span className={styles.episodeStatus}>{episode.status}</span>
-                            </li>
-                        );
-                    })}
-                </ul>
+        let subscribeButton: JSX.Element | null = null;
+
+        if ("Notification" in window && "serviceWorker" in navigator) {
+            subscribeButton = (
                 <button
                     className={styles.subscribeButton}
                     disabled={this.state.subscribed === SubscribeState.Unknown}
@@ -141,6 +203,28 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
                 >
                     {label}
                 </button>
+            );
+        }
+
+        return (
+            <div>
+                <h4>Episodes</h4>
+                <ul className={styles.episodeList}>
+                    {episodes.map(episode => {
+                        let className = styles.episodeEntry;
+                        if (this.props.script && episode.id !== this.props.script.episodeId) {
+                            className + " " + styles.episodeEntryWithArrow;
+                        }
+
+                        return (
+                            <li className={className}>
+                                <span className={styles.episodeName}>{episode.name}</span>
+                                <span className={styles.episodeStatus}>{episode.status}</span>
+                            </li>
+                        );
+                    })}
+                </ul>
+                {subscribeButton}
             </div>
         );
     }
@@ -148,6 +232,12 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
     async toggleSubscriptionState() {
         if (this.state.subscribed === SubscribeState.Unknown) {
             throw new Error("Cannot toggle subscription state as it is not known");
+        }
+
+        let permission = await Notification.requestPermission();
+
+        if (permission !== "granted") {
+            throw new Error("We do not have notification permissions");
         }
 
         let oldState = this.state.subscribed;
@@ -182,10 +272,20 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
     }
 
     async componentDidMount() {
-        let isSubscribed = await checkIfSubscribed(SUBSCRIPTION_TOPIC);
-
-        this.setState({
-            subscribed: isSubscribed ? SubscribeState.Subscribed : SubscribeState.Unsubscribed
-        });
+        showOrHideSideMenu = () => {
+            this.setState({
+                opened: !this.state.opened
+            });
+        };
+        if (
+            "Notification" in window &&
+            "serviceWorker" in navigator &&
+            (Notification as any).permission === "granted"
+        ) {
+            let isSubscribed = await checkIfSubscribed(SUBSCRIPTION_TOPIC);
+            this.setState({
+                subscribed: isSubscribed ? SubscribeState.Subscribed : SubscribeState.Unsubscribed
+            });
+        }
     }
 }
