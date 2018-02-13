@@ -113,7 +113,7 @@ function renderImage(bindTo: ChatBubble) {
     }
 
     return (
-        <div style={{ maxHeight: "60vh" }}>
+        <div key="image" style={{ maxHeight: "60vh" }}>
             <div
                 style={containerStyles}
                 className={styles.bubbleImageContainer}
@@ -131,7 +131,7 @@ function renderText(bindTo: ChatBubble) {
         return null;
     }
     return (
-        <div className={styles.bubbleTextPadding}>
+        <div key="text" className={styles.bubbleTextPadding}>
             <div className={styles.bubbleText} ref={el => (bindTo.textElement = el)}>
                 {bindTo.props.text}
             </div>
@@ -145,7 +145,11 @@ function renderLink(props: ChatBubbleProperties) {
     }
     if (props.link.specialAction === "open-contact-menu") {
         return (
-            <div onClick={showOrHideContactBox} className={styles.bubbleText + " " + styles.bubbleLink}>
+            <div
+                key="link"
+                onClick={showOrHideContactBox}
+                className={styles.bubbleText + " " + styles.bubbleLink}
+            >
                 {props.link.title}
             </div>
         );
@@ -153,7 +157,11 @@ function renderLink(props: ChatBubbleProperties) {
 
     if (props.link.specialAction === "open-side-menu") {
         return (
-            <div onClick={showOrHideSideMenu} className={styles.bubbleText + " " + styles.bubbleLink}>
+            <div
+                key="link"
+                onClick={showOrHideSideMenu}
+                className={styles.bubbleText + " " + styles.bubbleLink}
+            >
                 {props.link.title}
             </div>
         );
@@ -165,7 +173,12 @@ function renderLink(props: ChatBubbleProperties) {
     // }
 
     return (
-        <a target="_blank" className={styles.bubbleText + " " + styles.bubbleLink} href={props.link.url}>
+        <a
+            key="link"
+            target="_blank"
+            className={styles.bubbleText + " " + styles.bubbleLink}
+            href={props.link.url}
+        >
             {props.link.title}
             {/* <div className={styles.bubbleLinkImageContainer}>{linkImage}</div> */}
         </a>
@@ -177,7 +190,7 @@ function renderChapterIndicator(chapter: Chapter | undefined) {
         return null;
     }
     return (
-        <div>
+        <div key={"chapter-indicator"}>
             <div className={styles.chapterIndicatorText}>{chapter.name}</div>
             <div className={styles.chapterIndicatorLine} />
         </div>

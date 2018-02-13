@@ -36,7 +36,7 @@ export class DownloadProgress extends EventTarget {
         this.length = parseInt(lengthHeader, 10);
         this.reader = response.clone().body!.getReader();
         this.emitUpdate();
-        this.performRead();
+        this.performRead().catch(err => console.error(err));
     }
 
     emitUpdate() {

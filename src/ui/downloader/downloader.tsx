@@ -28,7 +28,6 @@ export class Downloader extends React.Component<DownloaderProps, DownloaderState
 
     constructor(props) {
         super(props);
-        console.log("creating downloader instance");
         this.state = {
             downloadCurrent: 0,
             downloadTotal: 1
@@ -67,6 +66,13 @@ export class Downloader extends React.Component<DownloaderProps, DownloaderState
         }
         this.cacheSync = new CacheSync(this.props.cacheName, this.props.urls);
         this.cacheSync.addEventListener("progress", this.updateDownloadProgress);
+        this.cacheSync.complete
+            .then(() => {
+                console.info("DOWNLOADER: cache complete?");
+            })
+            .catch(err => {
+                console.error("DOWNLOADER: error", err);
+            });
         // console.log("woah", e.detail.current);
     }
 

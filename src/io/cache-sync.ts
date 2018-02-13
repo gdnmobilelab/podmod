@@ -2,6 +2,7 @@ import { PendingPromise } from "../util/pending-promise";
 import { DownloadProgress, DownloadProgressEvent, DownloadProgressData } from "./download-progress";
 import * as parseRange from "range-parser";
 import { EventTarget } from "event-target-shim";
+import { splitAndPut, deleteExisting } from "./cache-split";
 
 export interface FileDetails {
     url: string;
@@ -81,51 +82,63 @@ export class CacheSync extends EventTarget {
         }
     }
 
-    performCacheCheck(cache: Cache, fileEntry: FileDetails) {
-        return cache.match(fileEntry.url).then((existingMatch: Response | undefined) => {
-            let checkRequest = new Request(fileEntry.url);
+    async performCacheCheck(cache: Cache, fileEntry: FileDetails) {
+        let existingMatch = await cache.match(fileEntry.url);
 
-            // If we already have an entry in the cache, adjust our request
-            // so we can get a 304 response if that applies.
+        let checkRequest = new Request(fileEntry.url);
 
-            if (existingMatch) {
-                let etag = existingMatch.headers.get("etag");
-                let lastModified = existingMatch.headers.get("last-modified");
+        // If we already have an entry in the cache, adjust our request
+        // so we can get a 304 response if that applies.
+        if (existingMatch) {
+            let etag = existingMatch.headers.get("etag");
+            let lastModified = existingMatch.headers.get("last-modified");
 
-                if (etag) {
-                    checkRequest.headers.append("If-None-Match", etag);
-                }
-
-                if (lastModified) {
-                    checkRequest.headers.append("If-Modified-Since", lastModified);
-                }
+            if (!etag && !lastModified) {
+                console.info(`${fileEntry.url} has no caching headers. Assuming it is up to date.`);
+                fileEntry.total = length;
+                fileEntry.downloaded = length;
+                this.emitProgressUpdate();
             }
 
-            return fetch(checkRequest).then(res => {
-                if (res.status == 304) {
-                    // The file hasn't changed since the last time we downloaded it
-                    // so we'll just set our progress based on the previously cached
-                    // version.
+            if (etag) {
+                checkRequest.headers.append("If-None-Match", etag);
+            }
 
-                    if (!existingMatch) {
-                        throw new Error("Should never get 304 response when we have no existing match!");
-                    }
+            if (lastModified) {
+                checkRequest.headers.append("If-Modified-Since", lastModified);
+            }
+        }
 
-                    // We know we have this header because it would have thrown an error
-                    // on initial download otherwise.
+        checkRequest.headers.set("bypass-cache", "true");
 
-                    let length = parseInt(existingMatch.headers.get("content-length")!, 10);
-                    console.info(`${fileEntry.url} is already in the cache.`);
-                    fileEntry.total = length;
-                    fileEntry.downloaded = length;
-                    this.emitProgressUpdate();
-                } else {
-                    // Add to the downloading array, so fetch events can use it
+        let res = await fetch(checkRequest);
 
-                    return this.cacheDownload(cache, fileEntry, res);
-                }
-            });
-        });
+        if (res.status == 304) {
+            // The file hasn't changed since the last time we downloaded it
+            // so we'll just set our progress based on the previously cached
+            // version.
+
+            if (!existingMatch) {
+                throw new Error("Should never get 304 response when we have no existing match!");
+            }
+
+            // We know we have this header because it would have thrown an error
+            // on initial download otherwise.
+
+            let length = parseInt(existingMatch.headers.get("content-length")!, 10);
+            console.info(`${fileEntry.url} is already in the cache.`);
+            fileEntry.total = length;
+            fileEntry.downloaded = length;
+            this.emitProgressUpdate();
+        } else {
+            // delete any existing asset
+
+            await deleteExisting(new Request(fileEntry.url), cache);
+
+            // Add to the downloading array, so fetch events can use it
+
+            return this.cacheDownload(cache, fileEntry, res);
+        }
     }
 
     cacheDownload(targetCache: Cache, fileEntry: FileDetails, incomingResponse: Response) {
@@ -149,14 +162,12 @@ export class CacheSync extends EventTarget {
 
         console.info(`Putting ${fileEntry.url} into the cache.`);
 
-        return Promise.all([targetCache.put(incomingResponse.url, incomingResponse), progress.complete]).then(
-            () => {
-                // Now that the response is successfully inserted into the cache, we don't
-                // need our temporary store any more.
-                CacheSync.currentlyDownloadingResponses.delete(cloneForResponse);
-                console.info(`Successfully put ${fileEntry.url} into the cache.`);
-            }
-        );
+        return Promise.all([splitAndPut(incomingResponse, targetCache), progress.complete]).then(() => {
+            // Now that the response is successfully inserted into the cache, we don't
+            // need our temporary store any more.
+            CacheSync.currentlyDownloadingResponses.delete(cloneForResponse);
+            console.info(`Successfully put ${fileEntry.url} into the cache.`);
+        });
     }
 
     emitProgressUpdate() {

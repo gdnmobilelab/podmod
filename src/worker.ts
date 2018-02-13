@@ -13,6 +13,9 @@ import {
     SubscribeOptions,
     UnsubscribeOptions
 } from "pushkin-client";
+import { cacheCheckSplit } from "./io/cache-split";
+
+// import checkForRangeRequest from "browser-range-response";
 
 import { fireCommand, ShowNotification, RunCommand, setup, registerCommand } from "worker-commands";
 
@@ -65,16 +68,19 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", (e: FetchEvent) => {
     e.respondWith(
         (async function() {
-            let cachedVersion = await caches.match(e.request);
+            let cachedVersion: Response | undefined = await cacheCheckSplit(e.request);
+
+            let bypassCache = e.request.headers.get("bypass-cache");
+
+            if (bypassCache) {
+                console.info("Specifically bypassing cache for", e.request.url);
+                return fetch(e.request);
+            }
+
             if (cachedVersion) {
                 return cachedVersion;
             }
 
-            let inProgressVersion = await CacheSync.matchInProgress(e.request);
-
-            if (inProgressVersion) {
-                return inProgressVersion;
-            }
             console.info("Going over the wire to fetch", e.request.url);
             return fetch(e.request);
         })()

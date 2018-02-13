@@ -35,6 +35,7 @@
     "dependencies": {
         "@types/react": "^16.0.22",
         "awesome-typescript-loader": "^3.2.3",
+        "browser-range-response": "git+https://github.com/gdnmobilelab/browser-range-response.git",
         "comlinkjs": "^2.3.0",
         "deep-equal": "^1.0.1",
         "deep-for-each": "^1.0.6",
