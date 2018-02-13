@@ -44,25 +44,25 @@ export class BottomInfo extends React.Component<BottomInfoProps, BottomInfoState
 
         let buttons: JSX.Element[] = [];
 
-        if ("caches" in window) {
-            buttons.push(
-                <button
-                    key="offline-download"
-                    className={styles.withCheckbox}
-                    onClick={() => this.props.offlineDownloadChange(!this.props.offlineDownloadEnabled)}
-                >
-                    <Downloader
-                        barClassName={styles.downloadBar}
-                        urls={this.props.script.assets}
-                        cacheName={this.props.script.podcastId + "_" + this.props.script.episodeId}
-                        doDownload={this.props.offlineDownloadEnabled}
-                        className={styles.downloadBar}
-                    />
-                    <span className={getCheckedClassName(this.props.offlineDownloadEnabled)} />
-                    <span className={styles.bottomInfoButtonText}>Save for Offline</span>
-                </button>
-            );
-        }
+        // if ("caches" in window && 1 == 2) {
+        //     buttons.push(
+        //         <button
+        //             key="offline-download"
+        //             className={styles.withCheckbox}
+        //             onClick={() => this.props.offlineDownloadChange(!this.props.offlineDownloadEnabled)}
+        //         >
+        //             <Downloader
+        //                 barClassName={styles.downloadBar}
+        //                 urls={this.props.script.assets}
+        //                 cacheName={this.props.script.podcastId + "_" + this.props.script.episodeId}
+        //                 doDownload={this.props.offlineDownloadEnabled}
+        //                 className={styles.downloadBar}
+        //             />
+        //             <span className={getCheckedClassName(this.props.offlineDownloadEnabled)} />
+        //             <span className={styles.bottomInfoButtonText}>Save for Offline</span>
+        //         </button>
+        //     );
+        // }
 
         if ("Notification" in window) {
             buttons.push(

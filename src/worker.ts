@@ -14,6 +14,7 @@ import {
     UnsubscribeOptions
 } from "pushkin-client";
 import { cacheCheckSplit } from "./io/cache-split";
+import checkForRangeRequest from "browser-range-response";
 
 // import checkForRangeRequest from "browser-range-response";
 
@@ -68,8 +69,6 @@ self.addEventListener("activate", e => {
 self.addEventListener("fetch", (e: FetchEvent) => {
     e.respondWith(
         (async function() {
-            let cachedVersion: Response | undefined = await cacheCheckSplit(e.request);
-
             let bypassCache = e.request.headers.get("bypass-cache");
 
             if (bypassCache) {
@@ -77,11 +76,26 @@ self.addEventListener("fetch", (e: FetchEvent) => {
                 return fetch(e.request);
             }
 
+            let searchFor: Request = e.request;
+
+            // if (e.request.url.indexOf("dummyQuery=") > -1) {
+            //     console.log("AMENDING QUERY");
+            //     let editableURL = new URL(e.request.url);
+            //     editableURL.searchParams.delete("dummyQuery");
+            //     searchFor = new Request(editableURL.href);
+            // }
+
+            let cachedVersion: Response | undefined = await cacheCheckSplit(searchFor);
+
+            if (cachedVersion) {
+                cachedVersion = await checkForRangeRequest(e.request, cachedVersion);
+            }
+
             if (cachedVersion) {
                 return cachedVersion;
             }
 
-            console.info("Going over the wire to fetch", e.request.url);
+            console.info("Going over the wire to fetch", e.request.url, e.request.headers.get("range"));
             return fetch(e.request);
         })()
     );

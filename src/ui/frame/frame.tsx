@@ -72,6 +72,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
         this.playStateChange = this.playStateChange.bind(this);
         this.audioProgress = this.audioProgress.bind(this);
         this.toggleContactWindow = this.toggleContactWindow.bind(this);
+        this.audioError = this.audioError.bind(this);
     }
 
     async loadData() {
@@ -117,6 +118,29 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
         });
     }
 
+    audioError(e: React.SyntheticEvent<HTMLAudioElement>) {
+        let source = e.target as HTMLAudioElement | HTMLSourceElement;
+        if (source instanceof HTMLSourceElement) {
+            source = source.parentNode as HTMLAudioElement;
+        }
+        console.log("error from", source);
+
+        // if (!this.state.playback) {
+        //     return;
+        // }
+
+        // let listener = () => {
+        //     if (!this.state.playback) {
+        //         throw new Error("OH NO");
+        //     }
+        //     console.log("loadstart again?", this.state.playback.current);
+        //     (source as HTMLAudioElement).currentTime = this.state.playback.current;
+        //     source.removeEventListener("loadstart", listener);
+        // };
+        // source.addEventListener("loadstart", listener);
+        // source.load();
+    }
+
     render() {
         let loadedPercent = 0;
         let playbackPercent = 0;
@@ -146,7 +170,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
 
             audio = (
                 <audio
-                    src={this.state.script.audioFile}
+                    // src={this.state.script.audioFile}
                     preload="auto"
                     // controls
                     // onProgress={this.audioProgress}
@@ -155,8 +179,8 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                     onPause={this.playStateChange}
                     onWaiting={() => this.setState({ buffering: true })}
                     // onPlaying={() => this.setState({ buffering: false })}
-                    // onError={err => console.warn("error", err.nativeEvent)}
-                    // onAbort={() => console.warn("abort!")}
+                    onError={this.audioError}
+                    onAbort={() => console.warn("abort!")}
                     // onEnded={() => console.warn("ended!")}
                     // onStalled={() => console.warn("stalled!")}
                     onLoadStart={() => this.setState({ buffering: true })}
@@ -164,7 +188,9 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                     title={this.state.currentChapterName}
                     style={{ position: "absolute", zIndex: 100 }}
                     ref={el => (this.audioElement = el as HTMLAudioElement)}
-                />
+                >
+                    <source src={this.state.script.audioFile} />
+                </audio>
             );
 
             dingElement = (
