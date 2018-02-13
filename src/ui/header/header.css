@@ -57,7 +57,7 @@
 }
 
 .header-expand {
-    height: 154px;
+    height: 142px;
 }
 
 .header-expand .header-eye {
@@ -67,7 +67,7 @@
 .header-interior {
     background-color: #f5f2f0;
     position: absolute;
-    height: 154px;
+    height: 134px;
     width: 100%;
     z-index: 2;
     overflow: hidden;
@@ -100,7 +100,7 @@
 }
 
 .header-expand .strange-bird-title {
-    transform: translate3d(150px, 34px, 0);
+    transform: translate3d(150px, 26px, 0);
 }
 
 .header p {
@@ -109,7 +109,7 @@
     position: absolute;
     padding-left: 150px;
     padding-right: 20px;
-    top: 60px;
+    top: 50px;
     opacity: 0;
     will-change: opacity;
     transition: opacity 0.1s linear;
