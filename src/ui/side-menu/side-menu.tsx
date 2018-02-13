@@ -217,7 +217,7 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
                         }
 
                         return (
-                            <li className={className}>
+                            <li className={className} key={episode.id}>
                                 <span className={styles.episodeName}>{episode.name}</span>
                                 <span className={styles.episodeStatus}>{episode.status}</span>
                             </li>

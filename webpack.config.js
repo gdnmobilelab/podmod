@@ -54,7 +54,7 @@ module.exports = {
     devtool: "source-map",
     plugins: [
         new HTMLWebpackPlugin({
-            title: "Podmod",
+            title: "Strange Bird",
             filename: "index.html",
             excludeChunks: ["worker"],
             template: "src/index.ejs"

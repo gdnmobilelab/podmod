@@ -41,3 +41,22 @@ if ("serviceWorker" in navigator) {
         }
     };
 }
+
+// import treo from "treo";
+// import treoPromise from "treo-promise";
+import { splitAndPut, cacheCheckSplit } from "./io/cache-split";
+
+// (async function() {
+//     try {
+//         let test = await fetch("/bundles/mona-ep-1/20mbfile");
+//         let cache = await caches.open("test-cache");
+//         console.log("DO SPLIT AND PUT");
+//         await splitAndPut(test, cache);
+
+//         let result = await cacheCheckSplit(new Request("/bundles/mona-ep-1/20mbfile"));
+//         let ab = await result!.arrayBuffer();
+//         console.log(ab);
+//     } catch (err) {
+//         console.error(err);
+//     }
+// })();
