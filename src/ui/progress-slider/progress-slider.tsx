@@ -2,6 +2,7 @@ import * as React from "react";
 import * as styles from "./progress-slider.css";
 import Pointable from "react-pointable";
 // import { MouseEvent } from "react";
+import { sendEvent } from "../../util/analytics";
 
 interface ProgressSliderProps {
     length: number;
@@ -130,6 +131,8 @@ export class ProgressSlider extends React.Component<ProgressSliderProps, Progres
             maximumX: width,
             minimumX: 0 - pickupX + left
         });
+
+        sendEvent("Web browser", "Audio scrubbing");
     }
 
     componentDidUpdate(oldProps, oldState: ProgressSliderState) {

@@ -3,6 +3,7 @@ import { ShowNotification } from "worker-commands";
 import { makeRelative } from "../../interfaces/script";
 import { sendNotification, removeNotification } from "../../util/notification-dispatch";
 import { activeDing } from "../ding/ding";
+import { sendEvent } from "../../util/analytics";
 
 const ALWAYS_SHOW_NOTIFICATIONS =
     process.env.NODE_ENV === "development" && window.location.href.indexOf("alwaysShow=1") > -1;
@@ -40,6 +41,10 @@ export class BubbleGroup extends React.Component<BubbleGroupProperties, BubbleGr
     componentDidMount() {
         if (this.props.silent === false) {
             activeDing!.ding();
+        }
+
+        if (this.props.notification) {
+            sendEvent("Web browser", "Shows", this.props.notification.body);
         }
 
         if (

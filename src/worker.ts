@@ -182,7 +182,7 @@ addListener("notification.process-click", (opts, e) => {
         throw new Error("No notification event?");
     }
     if (e && e.action) {
-        sendEvent("Notification", "Taps", e.action + ": " + e.notification.body);
+        sendEvent("Notification", e.action + " CTA", e.notification.body);
     } else {
         sendEvent("Notification", "Taps", e.notification.body);
     }

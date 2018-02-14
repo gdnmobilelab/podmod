@@ -6,6 +6,7 @@ import { runServiceWorkerCommand } from "service-worker-command-bridge";
 import { Chapter, makeRelative } from "../../interfaces/script";
 import { showOrHideContactBox } from "../contact-box/contact-box";
 import { showOrHideSideMenu } from "../side-menu/side-menu";
+import { sendEvent } from "../../util/analytics";
 
 export enum BubbleType {
     text = "text"
@@ -114,7 +115,13 @@ function renderImage(bindTo: ChatBubble) {
 
     return (
         <div key="image" style={{ maxHeight: "60vh" }} className={styles.bubbleImageContainer}>
-            <div style={containerStyles} onClick={() => setExpandedState(bindTo, true)}>
+            <div
+                style={containerStyles}
+                onClick={() => {
+                    setExpandedState(bindTo, true);
+                    sendEvent("Web Browser", "Image Expand", bindTo.props.images![0].url);
+                }}
+            >
                 {img}
                 {gallery}
             </div>
@@ -170,6 +177,9 @@ function renderLink(props: ChatBubbleProperties) {
 
     return (
         <a
+            onClick={() => {
+                sendEvent("Web Browser", "Link Click", props.link!.url);
+            }}
             key="link"
             target="_blank"
             className={styles.bubbleText + " " + styles.bubbleLink}

@@ -82,12 +82,11 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
                         {this.renderEpisodeDetails()}
                         {this.renderEpisodeNavigator()}
                         <h4>Ask Mona a Data Question</h4>
-                        <p>Contact Mona by X, Y, Z</p>
                         <button
                             className={styles.subscribeButton}
                             onClick={() => this.props.toggleContactBox("Podcast menu")}
                         >
-                            Ask Mona a question
+                            Ask now
                         </button>
                         <h4>Give Feedback</h4>
                         <p>

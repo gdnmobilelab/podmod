@@ -194,6 +194,10 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                     preload="auto"
                     // controls
                     // onProgress={this.audioProgress}
+                    onEnded={() => {
+                        sendEvent("Web browser", "Episode completed");
+                        sendEvent("Web browser", "Minutes listened", "", this.audioElement.currentTime);
+                    }}
                     onTimeUpdate={this.timeUpdate}
                     onPlay={this.playStateChange}
                     onPause={this.playStateChange}
@@ -355,6 +359,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
             clearTimeout(this.nextSecondTimeout);
         }
         this.nextSecondTimeout = undefined;
+        sendEvent("Web browser", "Minutes listened", "", this.audioElement.currentTime / 60);
     }
 
     moveChapter(byValue: number) {

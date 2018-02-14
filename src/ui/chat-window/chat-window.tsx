@@ -5,9 +5,11 @@ import { PerformanceScrollView, AddNewItemsTo } from "performance-scroll-view";
 import { ChatBubble, ChatBubbleProperties } from "../chat-bubble/chat-bubble";
 import { Script } from "../../interfaces/script";
 import { activeDing } from "../ding/ding";
+import { sendEvent } from "../../util/analytics";
 
 interface ChatWindowState {
     numberOfVisibleItems: number;
+    alreadySentScrollEvent: boolean;
 }
 
 interface ChatWindowProps {
@@ -43,7 +45,8 @@ export class ChatWindow extends React.Component<ChatWindowProps, ChatWindowState
         this.generateItem = this.generateItem.bind(this);
 
         this.state = {
-            numberOfVisibleItems: 0
+            numberOfVisibleItems: 0,
+            alreadySentScrollEvent: false
         };
     }
 
@@ -140,8 +143,29 @@ export class ChatWindow extends React.Component<ChatWindowProps, ChatWindowState
                 </div>
             );
         }
+
+        let touchMoveListen: ((Event) => void) = e => e.stopPropagation();
+
+        if (this.state.alreadySentScrollEvent === false) {
+            touchMoveListen = e => {
+                sendEvent("Web browser", "Scrolling", "");
+                e.stopPropagation();
+                this.setState({
+                    alreadySentScrollEvent: true
+                });
+            };
+        }
+
         return (
-            <div className={styles.chatContainer} onTouchMove={e => e.stopPropagation()}>
+            <div
+                className={styles.chatContainer}
+                onTouchStart={() => {
+                    this.setState({
+                        alreadySentScrollEvent: false
+                    });
+                }}
+                onTouchMove={touchMoveListen}
+            >
                 {innerView}
                 {avatar}
             </div>
