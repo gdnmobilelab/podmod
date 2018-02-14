@@ -3,6 +3,7 @@ import * as React from "react";
 import { Script } from "../../interfaces/script";
 import { checkIfSubscribed, subscribe, unsubscribe } from "../../util/subscription";
 import { makeRelative } from "../../interfaces/script";
+import { sendEvent } from "../../util/analytics";
 
 interface SideMenuState {
     opened: boolean;
@@ -11,7 +12,7 @@ interface SideMenuState {
 
 interface SideMenuProps {
     script?: Script;
-    toggleContactBox: () => void;
+    toggleContactBox: (fromSource: string) => void;
     isPlaying: boolean;
 }
 
@@ -82,7 +83,10 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
                         {this.renderEpisodeNavigator()}
                         <h4>Ask Mona a Data Question</h4>
                         <p>Contact Mona by X, Y, Z</p>
-                        <button className={styles.subscribeButton} onClick={this.props.toggleContactBox}>
+                        <button
+                            className={styles.subscribeButton}
+                            onClick={() => this.props.toggleContactBox("Podcast menu")}
+                        >
                             Ask Mona a question
                         </button>
                         <h4>Give Feedback</h4>
@@ -94,6 +98,7 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
                             target="_blank"
                             href="https://goo.gl/forms/LO6GvPYWRfvR9rpv2"
                             className={styles.subscribeButton}
+                            onClick={() => sendEvent("Web browser", "Take survey", "Podcast menu")}
                         >
                             Take a quick survey
                         </a>
@@ -117,7 +122,7 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
                             <li>
                                 <img
                                     src={makeRelative(
-                                        "./bundles/mona-ep-1/mona-headshot-round.png",
+                                        "./bundles/mona-ep-1/assets/josie-headshot-round.png",
                                         window.location.href
                                     )}
                                 />
@@ -264,6 +269,11 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
                 subscribed: oldState
             });
         }
+
+        sendEvent(
+            "Web browser",
+            oldState === SubscribeState.Subscribed ? "Unsubscribe" : "Subscribe to new episodes"
+        );
     }
 
     setAndStopPropagation(e: React.MouseEvent<any>, newState: any) {

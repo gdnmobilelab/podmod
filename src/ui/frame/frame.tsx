@@ -20,6 +20,7 @@ import { TimeFormatter } from "../time-formatter/time-formatter";
 import { NotificationRequestResult } from "../../interfaces/notification";
 import { setNotificationEnableState, getNotificationEnableState } from "../../util/notification-dispatch";
 import { ContactBox, setShowOrHideFunction } from "../contact-box/contact-box";
+import { NotificationPermissionBox } from "../notification-permission-box/notification-permission-box";
 
 declare var FontFaceSet: any;
 
@@ -47,7 +48,8 @@ interface PlayerState {
     showNotifications: boolean;
     downloadOffline: boolean;
     buffering: boolean;
-    showContactWindow: boolean;
+    showContactWindow?: string;
+    notificationPermission?: "granted" | "denied" | "default";
 }
 
 interface PlayerProps {
@@ -65,8 +67,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
             bottomSliderExpanded: false,
             showNotifications: false,
             downloadOffline: false,
-            buffering: false,
-            showContactWindow: false
+            buffering: false
         };
         this.timeUpdate = this.timeUpdate.bind(this);
         this.playStateChange = this.playStateChange.bind(this);
@@ -112,9 +113,9 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
         );
     }
 
-    toggleContactWindow() {
+    toggleContactWindow(source?: string) {
         this.setState({
-            showContactWindow: !this.state.showContactWindow
+            showContactWindow: source
         });
     }
 
@@ -158,11 +159,30 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
         let audio: JSX.Element | null = null;
         let dingElement: JSX.Element | null = null;
         let contactBox: JSX.Element | null = null;
+        let permissionWarning: JSX.Element | null = null;
 
         let chapterMarks: number[] = [];
 
+        if (this.state.showNotifications === true && this.state.notificationPermission === "denied") {
+            permissionWarning = (
+                <NotificationPermissionBox
+                    onClose={() =>
+                        this.setState({
+                            showNotifications: false
+                        })
+                    }
+                />
+            );
+        }
+
         if (this.state.showContactWindow) {
-            contactBox = <ContactBox onClose={this.toggleContactWindow} />;
+            sendEvent("Web browser", "Ask Mona", this.state.showContactWindow);
+            contactBox = (
+                <ContactBox
+                    source={this.state.showContactWindow}
+                    onClose={() => this.toggleContactWindow(undefined)}
+                />
+            );
         }
 
         if (this.state.script) {
@@ -206,6 +226,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
 
         return (
             <div className={styles.frame} onTouchMove={e => e.preventDefault()}>
+                <img className={styles.gmilLogo} src="bundles/mona-ep-1/assets/gmil-logo-white.svg" />
                 {audio}
                 {dingElement}
                 <Header
@@ -247,22 +268,42 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                             {this.state.buffering ? "Buffering..." : this.state.currentChapterName}
                         </div>
                         <TimeFormatter
-                            time={this.state.playback ? this.state.playback.total : undefined}
+                            time={
+                                this.state.playback
+                                    ? this.state.playback.total - this.state.playback.current
+                                    : undefined
+                            }
                             className={styles.timeBlock + " " + styles.timeLeft}
                         />
                     </div>
                     <Controls
-                        onPlay={() => this.play()}
-                        onPause={() => this.pause()}
-                        onRewind={() => this.setTime(-15, true)}
-                        onFastForward={() => this.setTime(15, true)}
+                        onPlay={() => {
+                            sendEvent("Web browser", "Play");
+                            this.play();
+                        }}
+                        onPause={() => {
+                            sendEvent("Web browser", "Pause");
+                            this.pause();
+                        }}
+                        onRewind={() => {
+                            sendEvent("Web browser", "15 seconds backwards");
+                            this.setTime(-15, true);
+                        }}
+                        onFastForward={() => {
+                            sendEvent("Web browser", "15 seconds forward");
+                            this.setTime(15, true);
+                        }}
                         onSkipBack={() => this.moveChapter(-1)}
                         onSkipForward={() => this.moveChapter(1)}
                         canPlay={this.state.playState == PlayState.Paused}
                         canPause={this.state.playState == PlayState.Playing}
-                        onBottomToggle={() =>
-                            this.setState({ bottomSliderExpanded: !this.state.bottomSliderExpanded })
-                        }
+                        onBottomToggle={() => {
+                            sendEvent(
+                                "Web browser",
+                                this.state.bottomSliderExpanded ? "Close episode menu" : "Open episode menu"
+                            );
+                            this.setState({ bottomSliderExpanded: !this.state.bottomSliderExpanded });
+                        }}
                     />
                     <StartButton
                         display={isInitialView}
@@ -276,6 +317,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                     toggleContactBox={this.toggleContactWindow}
                     isPlaying={this.state.playback !== undefined}
                 />
+                {permissionWarning}
             </div>
         );
     }
@@ -295,7 +337,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
     play() {
         this.nextSecondTimeout = undefined;
         this.audioElement.play().catch(console.error);
-        sendEvent("Web browser", "Play", "TO BE ADDED");
+
         if (!this.state.playback) {
             this.setState({
                 playback: {
@@ -309,7 +351,6 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
 
     pause() {
         this.audioElement.pause();
-        sendEvent("Web browser", "Pause");
         if (this.nextSecondTimeout) {
             clearTimeout(this.nextSecondTimeout);
         }
@@ -370,25 +411,6 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
     }
 
     async componentDidMount() {
-        try {
-            // let response = await runServiceWorkerCommand<CacheSyncRequest, CacheSyncResponse>("cachesync", {
-            //     cacheName: "mona-ep-1",
-            //     payloadURL: "./bundles/mona-ep-1/files.json"
-            // });
-            // response.progressEvents.onmessage = (e: MessageEvent) => {
-            //     this.setState({
-            //         download: {
-            //             current: e.data.current,
-            //             total: e.data.total
-            //         }
-            //     });
-            // };
-        } catch (ex) {
-            if (ex instanceof ServiceWorkerNotSupportedError === false) {
-                throw ex;
-            }
-        }
-
         // hackidy hack
         setShowOrHideFunction(this.toggleContactWindow);
 
@@ -398,7 +420,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
             let mediaSession = (navigator as any).mediaSession;
 
             mediaSession.setActionHandler("play", () => {
-                sendEvent("Lockscreen player", "Play", "TO BE ADDED");
+                sendEvent("Lockscreen player", "Play");
                 this.play();
             });
             mediaSession.setActionHandler("pause", () => {
@@ -406,18 +428,30 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                 this.pause();
             });
             mediaSession.setActionHandler("seekbackward", () => {
-                this.setTime(-10, true);
+                sendEvent("Web browser", "15 seconds backwards");
+                this.setTime(-15, true);
             });
             mediaSession.setActionHandler("seekforward", () => {
-                this.setTime(10, true);
-            });
-            mediaSession.setActionHandler("previoustrack", () => {
-                this.moveChapter(-1);
-            });
-            mediaSession.setActionHandler("nexttrack", () => {
-                this.moveChapter(1);
+                sendEvent("Web browser", "15 seconds forward");
+                this.setTime(15, true);
             });
         }
+
+        if (!("permissions" in navigator)) {
+            return;
+        }
+
+        let notificationPermission = await (navigator as any).permissions.query({ name: "notifications" });
+        console.info("PERMISSIONS: existing notification permission is", notificationPermission.state);
+        this.setState({
+            notificationPermission: notificationPermission.state
+        });
+        notificationPermission.onchange = () => {
+            console.info("PERMISSIONS: notification permission changed to", notificationPermission.state);
+            this.setState({
+                notificationPermission: notificationPermission.state
+            });
+        };
     }
 
     nextSecondTimeout: number | undefined;

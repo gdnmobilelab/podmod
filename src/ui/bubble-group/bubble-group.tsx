@@ -4,6 +4,9 @@ import { makeRelative } from "../../interfaces/script";
 import { sendNotification, removeNotification } from "../../util/notification-dispatch";
 import { activeDing } from "../ding/ding";
 
+const ALWAYS_SHOW_NOTIFICATIONS =
+    process.env.NODE_ENV === "development" && window.location.href.indexOf("alwaysShow=1") > -1;
+
 interface BubbleGroupProperties {
     notification?: ShowNotification;
     silent: boolean;
@@ -39,7 +42,10 @@ export class BubbleGroup extends React.Component<BubbleGroupProperties, BubbleGr
             activeDing!.ding();
         }
 
-        if (document.visibilityState === "visible" || !this.props.notification) {
+        if (
+            ALWAYS_SHOW_NOTIFICATIONS === false &&
+            (document.visibilityState === "visible" || !this.props.notification)
+        ) {
             // If the user is currently on the page we don't show these notifications
             return;
         }

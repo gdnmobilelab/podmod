@@ -66,3 +66,22 @@ body {
     font-family: "Guardian Sans Web";
     font-size: 14px;
 }
+
+.gmil-logo {
+    position: fixed;
+    top: 0px;
+    right: 0px;
+    width: 150px;
+    height: 150px;
+    opacity: 0.3;
+}
+
+@media (max-width: 500px) {
+    .gmil-logo {
+        display: none;
+    }
+}
+
+input[type="button"] {
+    outline: none;
+}

@@ -29,7 +29,7 @@ function newMessageGenerator(numberOfMessages: number) {
 
     return (
         <div className={styles.moreMessages}>
-            {numberOfMessages} new {messagesText}
+            &#8595;&nbsp;&nbsp;{numberOfMessages}&nbsp;&nbsp;new {messagesText}
         </div>
     );
 }

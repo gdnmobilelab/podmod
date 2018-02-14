@@ -2,6 +2,7 @@ import * as React from "react";
 import * as styles from "./start-button.css";
 import { NotificationsSupported } from "../../bridge/notification";
 import { NotificationRequestResult } from "../../interfaces/notification";
+import { sendEvent } from "../../util/analytics";
 
 interface StartButtonProps {
     display: boolean;
@@ -32,13 +33,21 @@ export function StartButton(props: StartButtonProps) {
                 <button
                     className={styles.highlightedButton}
                     onClick={() => {
+                        sendEvent("Web browser", "Play", "With push alert");
                         props.onPlay(true);
                         requestPermission(props.onNotificationPermissionChange);
                     }}
                 >
                     Play with push alerts
                 </button>
-                <button onClick={() => props.onPlay(false)}>Play without push alerts</button>
+                <button
+                    onClick={() => {
+                        sendEvent("Web browser", "Play", "Without push alert");
+                        props.onPlay(false);
+                    }}
+                >
+                    Play without push alerts
+                </button>
             </div>
         );
     } else {

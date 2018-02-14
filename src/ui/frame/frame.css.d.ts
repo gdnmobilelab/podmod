@@ -5,3 +5,4 @@ export const timeBlock: string;
 export const timeAndChapter: string;
 export const timeLeft: string;
 export const currentChapterName: string;
+export const gmilLogo: string;

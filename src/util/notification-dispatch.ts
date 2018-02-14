@@ -1,10 +1,13 @@
 import { ShowNotification, RunCommand, RemoveNotificationOptions } from "worker-commands";
 import { runServiceWorkerCommand } from "service-worker-command-bridge";
+import { sendEvent } from "./analytics";
 
 let sendNotifications = false;
 
 export function setNotificationEnableState(enabled: boolean) {
     console.info("Setting notification enabled state to", enabled);
+    sendEvent("Web browser", "Allow notifications", enabled ? "Allow" : "Block");
+
     sendNotifications = enabled;
 }
 

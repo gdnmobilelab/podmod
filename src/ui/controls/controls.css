@@ -25,6 +25,7 @@
     background-size: auto 80%;
     background-position: center center;
     color: transparent;
+    outline: none;
 }
 
 button.forward-15 {

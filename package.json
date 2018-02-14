@@ -5,8 +5,8 @@
     "main": "index.js",
     "scripts": {
         "dev": "webpack-dev-server",
-        "build": "NODE_ENV=production webpack",
-        "deploy-staging": "npm run build && aws s3 cp --recursive ./dist/ s3://www.stg.gdnmobilelab.com/podcast-test --acl \"public-read\" --cache-control=\"no-cache\""
+        "build": "NODE_ENV=production CONFIG_ENV=staging webpack",
+        "deploy-staging": "NODE_ENV=production CONFIG_ENV=staging webpack && aws s3 cp --recursive ./dist/ s3://www.stg.gdnmobilelab.com/podcast-test --acl \"public-read\" --cache-control=\"no-cache\""
     },
     "author": "",
     "license": "ISC",
@@ -37,10 +37,12 @@
         "awesome-typescript-loader": "^3.2.3",
         "browser-range-response": "git+https://github.com/gdnmobilelab/browser-range-response.git",
         "comlinkjs": "^2.3.0",
+        "create-guid": "git+https://github.com/gdnmobilelab/create-guid.git",
         "deep-equal": "^1.0.1",
         "deep-for-each": "^1.0.6",
         "event-target-shim": "^3.0.0",
         "file-loader": "^1.1.5",
+        "google-analytics-protocol": "git+https://github.com/gdnmobilelab/google-analytics-protocol.git",
         "html-webpack-plugin": "^2.30.1",
         "pepjs": "^0.4.3",
         "performance-scroll-view": "git+https://github.com/gdnmobilelab/performance-scroll-view.git",

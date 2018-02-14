@@ -15,39 +15,48 @@ import {
 } from "pushkin-client";
 import { cacheCheckSplit } from "./io/cache-split";
 import checkForRangeRequest from "browser-range-response";
+import { sendEvent } from "./util/analytics";
 
 // import checkForRangeRequest from "browser-range-response";
 
-import { fireCommand, ShowNotification, RunCommand, setup, registerCommand } from "worker-commands";
+import {
+    fireCommand,
+    ShowNotification,
+    RunCommand,
+    setup,
+    registerCommand,
+    addListener
+} from "worker-commands";
 
 declare var self: ServiceWorkerGlobalScope;
 
 async function checkCache() {
-    let hasCache = await caches.has("podmod-shell");
+    return console.warn("Disabled all caching for launch");
+    // let hasCache = await caches.has("podmod-shell");
 
-    if (hasCache) {
-        console.info("Removing existing cache of podcast shell.");
-        await caches.delete("podmod-shell");
-    }
+    // if (hasCache) {
+    //     console.info("Removing existing cache of podcast shell.");
+    //     await caches.delete("podmod-shell");
+    // }
 
-    // cache the files we need to serve this page offline
-    if (ENVIRONMENT !== "production") {
-        console.warn("Not caching worker assets because we are in dev mode");
-    } else {
-        console.info("Adding cache of podcast shell.");
-        let newCache = await caches.open("podmod-shell");
-        try {
-            await newCache.addAll(["styles.css", "./", "client.js"]);
-        } catch (err) {
-            console.error("Failed to cache!", err);
-        }
-    }
+    // // cache the files we need to serve this page offline
+    // if (process.env.NODE_ENV !== "production") {
+    //     console.warn("Not caching worker assets because we are in dev mode");
+    // } else {
+    //     console.info("Adding cache of podcast shell.");
+    //     let newCache = await caches.open("podmod-shell");
+    //     try {
+    //         await newCache.addAll(["styles.css", "./", "client.js"]);
+    //     } catch (err) {
+    //         console.error("Failed to cache!", err);
+    //     }
+    // }
 }
 
 async function clientClaim() {
     await self.clients.claim();
     let clients = await self.clients.matchAll();
-    if (ENVIRONMENT !== "production") {
+    if (process.env.NODE_ENV !== "production") {
         return;
     }
     clients.forEach(c =>
@@ -163,6 +172,20 @@ registerCommand("podmod.closephoto", async () => {
             command: "podmod.closephoto"
         })
     );
+});
+
+addListener("notification.show", opts => {
+    sendEvent("Notification", "Shows", opts.body);
+});
+addListener("notification.process-click", (opts, e) => {
+    if (!e) {
+        throw new Error("No notification event?");
+    }
+    if (e && e.action) {
+        sendEvent("Notification", "Taps", e.action + ": " + e.notification.body);
+    } else {
+        sendEvent("Notification", "Taps", e.notification.body);
+    }
 });
 
 setConfig({

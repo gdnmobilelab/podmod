@@ -2,6 +2,7 @@ import * as React from "react";
 import * as styles from "./bottom-info.css";
 import { Script } from "../../interfaces/script";
 import { Downloader } from "../downloader/downloader";
+import { sendEvent } from "../../util/analytics";
 
 interface BottomInfoProps {
     script?: Script;
@@ -29,6 +30,7 @@ export class BottomInfo extends React.Component<BottomInfoProps, BottomInfoState
     }
 
     share() {
+        sendEvent("Web browser", "Share", "Episode menu");
         (navigator as any).share({
             url: window.location.href,
             title: this.props.script ? this.props.script.metadata.title : ""
@@ -69,7 +71,14 @@ export class BottomInfo extends React.Component<BottomInfoProps, BottomInfoState
                 <button
                     key="show-alerts"
                     className={styles.withCheckbox}
-                    onClick={() => this.props.onAlertChange(!this.props.alertsEnabled)}
+                    onClick={() => {
+                        sendEvent(
+                            "Web browser",
+                            this.props.alertsEnabled ? "Disable alerts" : "Enable alerts",
+                            "Episode menu"
+                        );
+                        this.props.onAlertChange(!this.props.alertsEnabled);
+                    }}
                 >
                     <span className={getCheckedClassName(this.props.alertsEnabled)} />Show Alerts
                 </button>

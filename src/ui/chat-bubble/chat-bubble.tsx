@@ -113,12 +113,8 @@ function renderImage(bindTo: ChatBubble) {
     }
 
     return (
-        <div key="image" style={{ maxHeight: "60vh" }}>
-            <div
-                style={containerStyles}
-                className={styles.bubbleImageContainer}
-                onClick={() => setExpandedState(bindTo, true)}
-            >
+        <div key="image" style={{ maxHeight: "60vh" }} className={styles.bubbleImageContainer}>
+            <div style={containerStyles} onClick={() => setExpandedState(bindTo, true)}>
                 {img}
                 {gallery}
             </div>
@@ -147,7 +143,7 @@ function renderLink(props: ChatBubbleProperties) {
         return (
             <div
                 key="link"
-                onClick={showOrHideContactBox}
+                onClick={() => showOrHideContactBox("Post-episode CTA")}
                 className={styles.bubbleText + " " + styles.bubbleLink}
             >
                 {props.link.title}

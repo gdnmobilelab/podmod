@@ -1,15 +1,16 @@
 import * as React from "react";
 import * as styles from "./contact-box.css";
-
+import { sendEvent } from "../../util/analytics";
 interface ContactBoxProps {
     onClose: () => void;
+    source: string;
 }
 
 export function setShowOrHideFunction(func: () => void) {
     showOrHideContactBox = func;
 }
 
-export let showOrHideContactBox: () => void;
+export let showOrHideContactBox: (from: string) => void;
 
 export function ContactBox(props: ContactBoxProps) {
     // total hack shortcut to show/hide window
@@ -33,9 +34,30 @@ export function ContactBox(props: ContactBoxProps) {
                 </p>
                 <ul>
                     <li>
-                        <a href="tel:+15038327563">Leave a voicemail</a>
-                        <a href="sms:+15038327563">Send a text message</a>
-                        <a href="mailto:strangebird@theguardian.com">Write an e-mail</a>
+                        <a
+                            href="tel:+15038327563"
+                            onClick={() => {
+                                sendEvent("Web browser", "Leave a voicemail", props.source);
+                            }}
+                        >
+                            Leave a voicemail
+                        </a>
+                        <a
+                            href="sms:+15038327563"
+                            onClick={() => {
+                                sendEvent("Web browser", "Send text", props.source);
+                            }}
+                        >
+                            Send a text message
+                        </a>
+                        <a
+                            href="mailto:strangebird@theguardian.com"
+                            onClick={() => {
+                                sendEvent("Web browser", "Write email", props.source);
+                            }}
+                        >
+                            Write an e-mail
+                        </a>
                     </li>
                 </ul>
             </div>

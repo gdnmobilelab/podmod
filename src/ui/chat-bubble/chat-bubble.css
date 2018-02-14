@@ -20,7 +20,6 @@
     /* mess of global rule here, but it's the best I can do */
     border-radius: 15px 15px 15px 0px;
 }
-
 .chapter-indicator {
     text-align: center;
     font-family: "Guardian Sans Web";
@@ -97,6 +96,11 @@
 
 .bubble-image-container {
     /* margin-bottom: 10px; */
+    background-color: #f0f0f0;
+    background-image: url('data:image/svg+xml;utf8,<svg width="338" height="252" viewBox="0 0 338 252" xmlns="http://www.w3.org/2000/svg"><title>Artboard</title><g fill-rule="nonzero" fill="%23D2D2D2"><path d="M30.303 18.667c-6.437 0-11.655 5.223-11.655 11.666v191.334c0 6.443 5.218 11.666 11.655 11.666h277.394c6.437 0 11.655-5.223 11.655-11.666V30.333c0-6.443-5.218-11.666-11.655-11.666H30.303zm0-18.667h277.394C324.433 0 338 13.58 338 30.333v191.334C338 238.419 324.433 252 307.697 252H30.303C13.567 252 0 238.42 0 221.667V30.333C0 13.581 13.567 0 30.303 0z"/><path d="M75 108c-18.778 0-34-14.998-34-33.5C41 55.998 56.222 41 75 41s34 14.998 34 33.5c0 18.502-15.222 33.5-34 33.5zm0-16.172c9.713 0 17.586-7.758 17.586-17.328S84.713 57.172 75 57.172c-9.713 0-17.586 7.758-17.586 17.328S65.287 91.828 75 91.828zm143.315-24.325c3.616-3.371 9.25-3.332 12.819.089l64.015 61.38a9.247 9.247 0 0 1 2.851 6.674v59.087c0 5.118-4.167 9.267-9.307 9.267H58.307c-5.14 0-9.307-4.149-9.307-9.267v-19.691a9.247 9.247 0 0 1 2.79-6.615l61.66-60.233a9.338 9.338 0 0 1 12.703-.312l25.065 22.183 67.097-62.562zm61.07 117.964v-45.88l-54.797-52.541-66.844 62.326a9.338 9.338 0 0 1-12.546.162l-24.915-22.05-52.668 51.448v6.535h211.77z"/></g></svg>');
+    background-size: 100px;
+    background-repeat: no-repeat;
+    background-position: center center;
 }
 
 .expanded-video {
@@ -108,7 +112,7 @@
 
 .link-container {
     padding-right: 20px;
-    background-image: url('data:image/svg+xml;utf8,<svg width="46" height="80" viewBox="0 0 46 80" xmlns="http://www.w3.org/2000/svg"><title>link-arrow</title><path d="M8 8l28.453 31.858L8.14 71.89" stroke-width="12" stroke="#F5B227" fill="none" fill-rule="evenodd" stroke-linecap="round"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg width="46" height="80" viewBox="0 0 46 80" xmlns="http://www.w3.org/2000/svg"><title>link-arrow</title><path d="M8 8l28.453 31.858L8.14 71.89" stroke-width="12" stroke="%23F5B227" fill="none" fill-rule="evenodd" stroke-linecap="round"/></svg>');
     background-repeat: no-repeat;
     background-size: 15px auto;
     background-position: right center;

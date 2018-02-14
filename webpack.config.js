@@ -6,9 +6,17 @@ const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
 
 const webpack = require("webpack");
 
-let env = process.env.NODE_ENV === "production" ? "production" : "staging";
+let env = process.env.NODE_ENV || "development";
 
-let config = require(`./config/${env}.json`);
+let configEnv = process.env.CONFIG_ENV || env;
+
+let config = require(`./config/${configEnv}.json`);
+
+let fullConfig = Object.assign({}, config, { "process.env.NODE_ENV": env, BUILD_TIME: Date.now() });
+let stringifiedConfig = {};
+Object.keys(fullConfig).forEach(key => {
+    stringifiedConfig[key] = JSON.stringify(fullConfig[key]);
+});
 
 module.exports = {
     entry: {
@@ -66,13 +74,7 @@ module.exports = {
             }
         ]),
         new ExtractTextPlugin("styles.css"),
-        new webpack.DefinePlugin({
-            PUSHKIN_HOST: JSON.stringify(config.PUSHKIN_HOST),
-            PUSHKIN_KEY: JSON.stringify(config.PUSHKIN_KEY),
-            ENVIRONMENT: JSON.stringify(env),
-            "process.env.NODE_ENV": JSON.stringify(env),
-            BUILD_TIME: JSON.stringify(Date.now())
-        })
+        new webpack.DefinePlugin(stringifiedConfig)
     ]
 };
 
