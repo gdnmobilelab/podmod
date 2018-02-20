@@ -2,7 +2,7 @@
 
 An "augmented" podcast player by the Guardian Mobile Innovation Lab. Delivers links and images to listeners at various marked points during playback.
 
-<img src='readme-img.png' style='max-width: 300px'/>
+<img src='readme-img.png' style='max-height: 500px; display:block;margin:auto'/>
 
 ## State of the project
 
