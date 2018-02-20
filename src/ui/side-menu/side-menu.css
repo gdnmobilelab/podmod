@@ -22,7 +22,6 @@
     transform: translate3d(100%, 0, 0);
     transition: transform 0.2s linear;
     z-index: 3;
-    font-family: "Guardian Text Egyptian Web";
     box-sizing: border-box;
 }
 
@@ -37,14 +36,6 @@
 }
 
 .top-wing {
-    background-image: url("../../../bundles/mona-ep-1/side-menu-wing.jpg");
-    background-repeat: no-repeat;
-    background-size: auto 100%;
-    width: 100%;
-    height: 60px;
-    margin-top: -20px;
-    /* margin-left: -20px; */
-    margin-bottom: 20px;
 }
 
 .opened-container .side-menu {
@@ -59,7 +50,7 @@
     pointer-events: auto;
     z-index: 3;
     background: transparent;
-    background-image: url('data:image/svg+xml;utf8,<svg width="70" height="48" viewBox="0 0 70 48" xmlns="http://www.w3.org/2000/svg"><title>menu-button</title><g fill="%23F7B300" fill-rule="evenodd"><path d="M0 0h72v8H0zM0 20h72v8H0zM0 40h72v8H0z"/></g></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg width="70" height="48" viewBox="0 0 70 48" xmlns="http://www.w3.org/2000/svg"><title>menu-button</title><g fill="%23000" fill-rule="evenodd"><path d="M0 0h72v8H0zM0 20h72v8H0zM0 40h72v8H0z"/></g></svg>');
     background-size: 100% 100%;
     background-repeat: no-repeat;
     border: none;
@@ -71,17 +62,13 @@
 }
 
 .strangebird-header {
-    background: url("../../../bundles/mona-ep-1/strange_bird_header.svg");
-    background-repeat: no-repeat;
-    background-size: contain;
-    color: transparent;
     font-size: 40px;
     margin: 0;
     max-width: 100%;
 }
 
 .closer-button {
-    background-image: url('data:image/svg+xml;utf8,<svg width="55" height="53" viewBox="0 0 55 53" xmlns="http://www.w3.org/2000/svg"><title>close-button</title><g stroke="%23F5B227" stroke-width="4" fill="none" fill-rule="evenodd" stroke-linecap="round"><path d="M50 4L4.9 49.1M4 4l45.1 45.1"/></g></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg width="55" height="53" viewBox="0 0 55 53" xmlns="http://www.w3.org/2000/svg"><title>close-button</title><g stroke="%23000" stroke-width="4" fill="none" fill-rule="evenodd" stroke-linecap="round"><path d="M50 4L4.9 49.1M4 4l45.1 45.1"/></g></svg>');
 }
 
 .side-menu h4 {
@@ -94,7 +81,6 @@
 
 .side-menu p {
     line-height: 1.3em;
-    font-family: "Guardian Sans Web";
     font-size: 14px;
     margin-top: 0;
 }
@@ -110,7 +96,6 @@
     border-radius: 15px;
     margin: 0;
     padding: 10px 15px;
-    font-family: "Guardian Sans Web";
     font-size: 14px;
     display: flex;
     margin-bottom: 5px;
@@ -141,10 +126,9 @@
     border-radius: 15px;
     margin: 0;
     padding: 10px 15px;
-    font-family: "Guardian Text Egyptian Web";
     font-size: 14px;
     font-weight: bold;
-    background: #f5b227;
+    background: #ccc;
     color: #fff;
     border: none;
     display: block;

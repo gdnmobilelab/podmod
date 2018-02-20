@@ -8,3 +8,4 @@ declare const process: {
 // declare const ENVIRONMENT: "production" | "staging";
 declare const BUILD_TIME: number;
 declare const ANALYTICS_ID: string | undefined;
+declare const SCRIPT_URL: string;

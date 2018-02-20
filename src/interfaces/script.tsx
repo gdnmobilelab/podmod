@@ -17,6 +17,19 @@ export interface ScriptMetadata {
     artwork: string;
 }
 
+export interface ScriptContact {
+    tel?: string;
+    sms?: string;
+    email?: string;
+}
+
+export interface ScriptTeamMember {
+    name: string;
+    role: string;
+    credit: string;
+    photo: string;
+}
+
 export interface Script {
     items: ChatBubbleProperties[];
     chapters: Chapter[];
@@ -27,6 +40,8 @@ export interface Script {
     episodeId: string;
     assets: string[];
     dingFile: string;
+    contact: ScriptContact;
+    team: ScriptTeamMember[];
 }
 
 export function makeRelative(url: string, baseURL: string) {
@@ -60,8 +75,6 @@ function mapScriptEntry(
     let notificationOptions: ShowNotification = {
         title: "Mona from The Guardian",
         body: response.text || response.notificationOnlyText || "",
-        icon: makeRelative("./bundles/mona-ep-1/mona-headshot-round.png", window.location.href),
-        badge: makeRelative("./bundles/mona-ep-1/lab_badge.png", window.location.href),
         events: {
             onclick: [
                 {

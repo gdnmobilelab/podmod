@@ -1,5 +1,5 @@
 .bottom-info {
-    background: #bd8b55;
+    background: #bbb;
     padding: 15px;
     color: #fff;
     /* transform: translateY(-100%); */
@@ -12,28 +12,24 @@
 
 .bottom-info h3 {
     margin: 0;
-    font-family: "Guardian Text Egyptian Web";
 }
 
 .description {
-    font-family: "Guardian Sans Web";
     font-size: 16px;
     line-height: 1.3em;
 }
 
 .subtitle {
-    color: #fad893;
-    font-family: "Guardian Sans Web";
+    color: #eee;
     font-size: 16px;
     margin: 0.5em 0 1em;
 }
 
 .bottom-info button {
-    color: #bd8b55;
+    color: #bbb;
     background: #fff;
     border: none;
     padding: 7px 10px;
-    font-family: "Guardian Sans Web";
     border-radius: 14px;
     padding-left: 30px;
     position: relative;
@@ -58,7 +54,7 @@ button.with-checkbox {
 
 .checkbox {
     /* background-color: red; */
-    background-image: url('data:image/svg+xml;utf8,<svg width="42" height="42" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg"><title>tick_off</title><rect width="42" height="42" rx="5" fill="%23BD8B55" fill-rule="evenodd"/></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg width="42" height="42" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg"><title>tick_off</title><rect width="42" height="42" rx="5" fill="%23000" fill-rule="evenodd"/></svg>');
     background-repeat: no-repeat;
     background-size: 100% 100%;
     display: block;
@@ -74,13 +70,13 @@ button.with-checkbox {
 }
 
 .checkbox-ticked {
-    background-image: url('data:image/svg+xml;utf8,<svg width="42" height="42" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><title>tick_on</title><defs><path d="M37.33 0C39.9 0 42 2.1 42 4.67v32.66C42 39.9 39.9 42 37.33 42H4.67C2.1 42 0 39.9 0 37.33V4.67C0 2.1 2.1 0 4.67 0h32.66zm-21 32.67l21-20.2-3.26-3.14-17.74 17.05-8.4-8.07-3.26 3.14 11.66 11.22z" id="a"/></defs><g fill="none" fill-rule="evenodd"><path fill="%23FFF" d="M3 5h36v29H3z"/><mask id="b" fill="%23fff"><use xlink:href="%23a"/></mask><path fill="%23BD8B55" mask="url(%23b)" d="M-10 52h62v-62h-62z"/></g></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg width="42" height="42" viewBox="0 0 42 42" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><title>tick_on</title><defs><path d="M37.33 0C39.9 0 42 2.1 42 4.67v32.66C42 39.9 39.9 42 37.33 42H4.67C2.1 42 0 39.9 0 37.33V4.67C0 2.1 2.1 0 4.67 0h32.66zm-21 32.67l21-20.2-3.26-3.14-17.74 17.05-8.4-8.07-3.26 3.14 11.66 11.22z" id="a"/></defs><g fill="none" fill-rule="evenodd"><path fill="%23FFF" d="M3 5h36v29H3z"/><mask id="b" fill="%23fff"><use xlink:href="%23a"/></mask><path fill="%23000" mask="url(%23b)" d="M-10 52h62v-62h-62z"/></g></svg>');
 }
 
 .share {
     background-repeat: no-repeat;
     background-size: 100% 100%;
-    background-image: url('data:image/svg+xml;utf8,<svg width="44" height="39" viewBox="0 0 44 39" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><title>share_button</title><defs><path id="a" d="M.67 14.78l30 4.22-30 4.22L.69 38l41.98-19L.69 0z"/></defs><g fill="none" fill-rule="evenodd"><mask id="b" fill="%23fff"><use xlink:href="%23a"/></mask><path fill="%23BD8B55" mask="url(%23b)" d="M-9.33 48h62v-58h-62z"/></g></svg>');
+    background-image: url('data:image/svg+xml;utf8,<svg width="44" height="39" viewBox="0 0 44 39" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><title>share_button</title><defs><path id="a" d="M.67 14.78l30 4.22-30 4.22L.69 38l41.98-19L.69 0z"/></defs><g fill="none" fill-rule="evenodd"><mask id="b" fill="%23fff"><use xlink:href="%23a"/></mask><path fill="%23000" mask="url(%23b)" d="M-9.33 48h62v-58h-62z"/></g></svg>');
     display: block;
     position: absolute;
     width: 1em;

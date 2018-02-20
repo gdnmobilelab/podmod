@@ -1,4 +1,3 @@
-import { createAudioTest } from "./ui/audio-test";
 import { render } from "react-dom";
 import { createElement } from "react";
 import { Frame } from "./ui/frame/frame";
@@ -19,7 +18,7 @@ document.body.appendChild(container);
 
 render(
     createElement(Frame, {
-        scriptURL: new URL("./bundles/mona-ep-1/script.json", window.location.href).href
+        scriptURL: new URL(SCRIPT_URL, window.location.href).href
     }),
     container
 );

@@ -34,10 +34,9 @@
 }
 
 .start-button-container button.highlighted-button {
-    background: #f5b227;
+    background: #ccc;
     color: #fff;
     border-radius: 20px;
-    font-family: "Guardian Text Egyptian Web";
     font-size: 14px;
     font-weight: bold;
     font-size: 16px;

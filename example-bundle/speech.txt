@@ -1,0 +1,7 @@
+This is an example of the audio you might use as part of an augmented podcast.
+[[slnc 2000]]
+At this point in the podcast, we might want to link to an external web site, like this.
+[[slnc 2000]]
+Or, maybe we want to show a photo of a person we're talking to, or a location we visited, like this.
+[[slnc 2000]]
+Anyway, this has been an example podcast. Please tune in for the next episode.

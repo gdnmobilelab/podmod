@@ -14,6 +14,7 @@ interface SideMenuProps {
     script?: Script;
     toggleContactBox: (fromSource: string) => void;
     isPlaying: boolean;
+    scriptURL: string;
 }
 
 interface Episode {
@@ -56,6 +57,25 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
         let containerStyles = styles.sideMenuContainer;
         if (this.state.opened) {
             containerStyles += " " + styles.openedContainer;
+        }
+
+        let teamMembers: JSX.Element[] = [];
+
+        if (this.props.script) {
+            teamMembers = this.props.script.team.map((member, idx) => {
+                return (
+                    <li key={`team_member_${idx}`}>
+                        <img src={makeRelative(member.photo, this.props.scriptURL)} />
+                        <div>
+                            <p>
+                                <em>{member.role}</em>
+                            </p>
+                            <p>{member.name}</p>
+                            <p>{member.credit}</p>
+                        </div>
+                    </li>
+                );
+            });
         }
 
         return (
@@ -102,52 +122,7 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
                             Take a quick survey
                         </a>
                         <h4>The Team</h4>
-                        <ul className={styles.theTeam}>
-                            <li>
-                                <img
-                                    src={makeRelative(
-                                        "./bundles/mona-ep-1/mona-headshot-round.png",
-                                        window.location.href
-                                    )}
-                                />
-                                <div>
-                                    <p>
-                                        <em>Host</em>
-                                    </p>
-                                    <p>Mona Chalabi</p>
-                                    <p>Data Editor, The Guardian</p>
-                                </div>
-                            </li>
-                            <li>
-                                <img
-                                    src={makeRelative(
-                                        "./bundles/mona-ep-1/assets/josie-headshot-round.png",
-                                        window.location.href
-                                    )}
-                                />
-                                <div>
-                                    <p>
-                                        <em>Producer</em>
-                                    </p>
-                                    <p>Josie Holtzman</p>
-                                    <p>Producer, Roads and Kingdoms</p>
-                                </div>
-                            </li>
-                            <li>
-                                <img
-                                    src={makeRelative(
-                                        "./bundles/mona-ep-1/gmil-logo.svg",
-                                        window.location.href
-                                    )}
-                                />
-                                <div>
-                                    <p>
-                                        <em>Concept &amp; Development</em>
-                                    </p>
-                                    <p>The Guardian Mobile Innovation Lab</p>
-                                </div>
-                            </li>
-                        </ul>
+                        <ul className={styles.theTeam}>{teamMembers}</ul>
                         <p className={styles.contactUs}>
                             Contact us:{" "}
                             <a href="mailto:innovationlab@theguardian.com">innovationlab@theguardian.com</a>

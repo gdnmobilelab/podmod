@@ -1,0 +1,62 @@
+{
+    "podcastId": "test-podcast",
+    "episodeId": "example",
+    "audioFile": "audio.m4a",
+    "dingFile": "ding.mp3",
+    "metadata": {
+        "length": 28,
+        "title": "Test Podcast",
+        "episodeName": "Example Episode",
+        "description": "This is an example podcast",
+        "avatarFile": "robot_headshot.png",
+        "artwork": "assets/thumb-maat-lrg.jpg"
+    },
+    "contact": {
+        "tel": "+15550000000",
+        "sms": "+15550000000",
+        "email": "email@example.com"
+    },
+    "team": [
+        {
+            "name": "Robot Voice",
+            "role": "Presenter",
+            "credit": "Isn't a real person",
+            "photo": "robot_headshot.png"
+        }
+    ],
+    "assets": [],
+    "chapters": [
+        {
+            "name": "Example Episode",
+            "time": 0
+        }
+    ],
+    "items": [
+        {
+            "silent": true,
+            "time": 0,
+            "type": "text",
+            "text": "Welcome! I’m your host, Mona Chalabi."
+        },
+        {
+            "time": 12,
+            "type": "text",
+            "link": {
+                "url": "https://www.example.org",
+                "title": "An example site"
+            }
+        },
+        {
+            "time": 21,
+            "type": "text",
+            "text": "This is a photo of Manhattan.",
+            "images": [
+                {
+                    "url": "manhattan.jpg",
+                    "width": 640,
+                    "height": 426
+                }
+            ]
+        }
+    ]
+}

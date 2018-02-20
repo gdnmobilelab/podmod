@@ -175,12 +175,13 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
             );
         }
 
-        if (this.state.showContactWindow) {
+        if (this.state.showContactWindow && this.state.script) {
             sendEvent("Web browser", "Ask Mona", this.state.showContactWindow);
             contactBox = (
                 <ContactBox
                     source={this.state.showContactWindow}
                     onClose={() => this.toggleContactWindow(undefined)}
+                    contact={this.state.script.contact}
                 />
             );
         }
@@ -230,7 +231,6 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
 
         return (
             <div className={styles.frame} onTouchMove={e => e.preventDefault()}>
-                <img className={styles.gmilLogo} src="bundles/mona-ep-1/assets/gmil-logo-white.svg" />
                 {audio}
                 {dingElement}
                 <Header
@@ -320,6 +320,7 @@ export class Frame extends React.Component<PlayerProps, PlayerState> {
                     script={this.state.script}
                     toggleContactBox={this.toggleContactWindow}
                     isPlaying={this.state.playback !== undefined}
+                    scriptURL={this.props.scriptURL}
                 />
                 {permissionWarning}
             </div>

@@ -34,7 +34,7 @@ body {
 }
 
 .controls {
-    background: #f5b226;
+    background: #ccc;
     flex-shrink: 0;
     /* padding: 3vw 1vw; */
     position: relative;
@@ -42,7 +42,6 @@ body {
 
 .time-block {
     color: #fff;
-    font-family: "Guardian Sans Web";
     font-size: 12px;
     display: block;
     flex-grow: 1;
@@ -63,7 +62,6 @@ body {
 .current-chapter-name {
     text-align: center;
     color: #fff;
-    font-family: "Guardian Sans Web";
     font-size: 14px;
 }
 

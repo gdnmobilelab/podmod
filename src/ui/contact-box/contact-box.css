@@ -32,13 +32,11 @@
 }
 
 .contact-box h3 {
-    font-family: "Guardian Text Egyptian Web";
     margin: 0;
     margin: 1em 0;
 }
 
 .contact-box p {
-    font-family: "Guardian Sans Web";
     line-height: 1.3em;
     margin: 1.5em 0;
 }
@@ -54,7 +52,6 @@
     border-radius: 15px;
     margin: 0;
     padding: 10px 15px;
-    font-family: "Guardian Text Egyptian Web";
     font-size: 14px;
     font-weight: bold;
     background: #f5b227;
