@@ -6,11 +6,14 @@
     "scripts": {
         "dev": "webpack-dev-server",
         "build": "NODE_ENV=production CONFIG_ENV=staging webpack",
+        "example-copy-config":
+            "mkdir -p config && cp example-bundle/example-config.json config/development.json",
         "example-copy-files":
             "mkdir -p ./bundles/example-podcast && cp -r ./example-bundle/to-copy/* ./bundles/example-podcast",
         "example-make-audio":
             "say -f example-bundle/speech.txt --file-format=mp4f -o ./bundles/example-podcast/audio.m4a",
-        "build-example-podcast": "npm run example-copy-files && npm run example-make-audio"
+        "build-example-podcast":
+            "npm run example-copy-config && npm run example-copy-files && npm run example-make-audio"
     },
     "author": "",
     "license": "ISC",
