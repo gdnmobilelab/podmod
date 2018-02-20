@@ -251,7 +251,7 @@ export class SideMenu extends React.Component<SideMenuProps, SideMenuState> {
         });
 
         try {
-            if (this.state.subscribed === SubscribeState.Subscribed) {
+            if (oldState === SubscribeState.Subscribed) {
                 let sub = await unsubscribe(SUBSCRIPTION_TOPIC);
                 this.setState({
                     subscribed: SubscribeState.Unsubscribed

@@ -6,7 +6,10 @@
     "scripts": {
         "dev": "webpack-dev-server",
         "build": "NODE_ENV=production CONFIG_ENV=staging webpack",
-        "deploy-staging": "NODE_ENV=production CONFIG_ENV=staging webpack && aws s3 cp --recursive ./dist/ s3://www.stg.gdnmobilelab.com/podcast-test --acl \"public-read\" --cache-control=\"no-cache\""
+        "deploy-staging":
+            "NODE_ENV=production CONFIG_ENV=staging webpack && aws s3 cp --recursive ./dist/ s3://www.stg.gdnmobilelab.com/podcast-test --acl \"public-read\" --cache-control=\"no-cache\"",
+        "deploy-production":
+            "NODE_ENV=production webpack && aws s3 cp --recursive ./dist/ s3://www.gdnmobilelab.com/strangebird --acl \"public-read\" --cache-control=\"public, max-age=60\""
     },
     "author": "",
     "license": "ISC",

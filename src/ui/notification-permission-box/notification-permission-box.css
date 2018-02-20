@@ -1,0 +1,12 @@
+.button-box {
+    text-align: right;
+}
+
+.button-box button {
+    color: #f5b227;
+    border: none;
+    background: transparent;
+    text-transform: uppercase;
+    font-family: "Guardian Sans Web";
+    font-weight: bold;
+}

@@ -75,40 +75,40 @@ self.addEventListener("activate", e => {
     e.waitUntil(clientClaim());
 });
 
-self.addEventListener("fetch", (e: FetchEvent) => {
-    e.respondWith(
-        (async function() {
-            let bypassCache = e.request.headers.get("bypass-cache");
+// self.addEventListener("fetch", (e: FetchEvent) => {
+//     e.respondWith(
+//         (async function() {
+//             let bypassCache = e.request.headers.get("bypass-cache");
 
-            if (bypassCache) {
-                console.info("Specifically bypassing cache for", e.request.url);
-                return fetch(e.request);
-            }
+//             if (bypassCache) {
+//                 console.info("Specifically bypassing cache for", e.request.url);
+//                 return fetch(e.request);
+//             }
 
-            let searchFor: Request = e.request;
+//             let searchFor: Request = e.request;
 
-            // if (e.request.url.indexOf("dummyQuery=") > -1) {
-            //     console.log("AMENDING QUERY");
-            //     let editableURL = new URL(e.request.url);
-            //     editableURL.searchParams.delete("dummyQuery");
-            //     searchFor = new Request(editableURL.href);
-            // }
+//             // if (e.request.url.indexOf("dummyQuery=") > -1) {
+//             //     console.log("AMENDING QUERY");
+//             //     let editableURL = new URL(e.request.url);
+//             //     editableURL.searchParams.delete("dummyQuery");
+//             //     searchFor = new Request(editableURL.href);
+//             // }
 
-            let cachedVersion: Response | undefined = await cacheCheckSplit(searchFor);
+//             let cachedVersion: Response | undefined = await cacheCheckSplit(searchFor);
 
-            if (cachedVersion) {
-                cachedVersion = await checkForRangeRequest(e.request, cachedVersion);
-            }
+//             if (cachedVersion) {
+//                 cachedVersion = await checkForRangeRequest(e.request, cachedVersion);
+//             }
 
-            if (cachedVersion) {
-                return cachedVersion;
-            }
+//             if (cachedVersion) {
+//                 return cachedVersion;
+//             }
 
-            console.info("Going over the wire to fetch", e.request.url, e.request.headers.get("range"));
-            return fetch(e.request);
-        })()
-    );
-});
+//             console.info("Going over the wire to fetch", e.request.url, e.request.headers.get("range"));
+//             return fetch(e.request);
+//         })()
+//     );
+// });
 
 // CommandListener.bind("cachesync", (request: CacheSyncRequest) => {
 //     let sync = new CacheSync(request.cacheName, request.payloadURL);
@@ -195,10 +195,15 @@ setConfig({
 
 CommandListener.bind("get-subscribed-topics", () => {
     console.info("WORKER: getting subscribed topics from pushkin");
-    return getSubscribedTopics().then(topics => {
-        console.log("got topics!", topics);
-        return topics;
-    });
+    return getSubscribedTopics()
+        .then(topics => {
+            console.log("got topics!", topics);
+            return topics;
+        })
+        .catch(err => {
+            console.error(err);
+            throw err;
+        });
 });
 CommandListener.bind("push-subscribe", (opts: SubscribeOptions) => {
     return subscribeToTopic(opts);

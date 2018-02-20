@@ -33,7 +33,21 @@ export function makeRelative(url: string, baseURL: string) {
     return new URL(url, baseURL).href;
 }
 
-function mapScriptEntry(response: ChatBubbleProperties, index: number, baseURL: URL): JSX.Element {
+function mapScriptEntry(
+    response: ChatBubbleProperties,
+    index: number,
+    baseURL: URL
+): JSX.Element | undefined {
+    // Hack for last-minute iOS bug
+
+    if (
+        (!("Notification" in window) || !("serviceWorker" in navigator)) &&
+        response.link &&
+        response.link.specialAction === "open-side-menu"
+    ) {
+        return undefined;
+    }
+
     let mappedProperties: ChatBubbleProperties = {
         time: response.time
     };
@@ -158,9 +172,12 @@ export function mapScriptEntries(script: Script, baseURL: URL) {
             );
             currentChapterIndex++;
         }
-        items.push(mapScriptEntry(scriptItem, idx, baseURL));
-    });
 
+        let item = mapScriptEntry(scriptItem, idx, baseURL);
+        if (item) {
+            items.push(item);
+        }
+    });
     // let createdItems = script.items.map(i => mapScriptEntry(i, baseURL));
 
     // let chapterIndicators = script.chapters.map(c => {

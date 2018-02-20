@@ -120,7 +120,7 @@ export class ChatWindow extends React.Component<ChatWindowProps, ChatWindowState
                 <PerformanceScrollView
                     className={styles.chat + " chat-window"}
                     numberOfItems={this.state.numberOfVisibleItems}
-                    itemBufferSize={21}
+                    itemBufferSize={this.props.elements!.length}
                     itemGenerator={this.generateItem}
                     addNewItemsTo={AddNewItemsTo.Bottom}
                     animationEaseFunction={easeOutBack}

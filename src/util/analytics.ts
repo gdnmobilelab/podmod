@@ -35,7 +35,8 @@ export function sendPageView(url: string, title?: string) {
         dh: brokenApart.hostname,
         dp: brokenApart.pathname,
         dt: title,
-        cd1: "{{clientId}}"
+        cd1: "{{clientId}}",
+        dr: document.referrer
     };
 
     if (!ANALYTICS_ID) {
