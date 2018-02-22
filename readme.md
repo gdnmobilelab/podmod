@@ -26,6 +26,18 @@ Now you should be able to run the project by running:
 
 then going to http://localhost:8080 in your browser.
 
+## Configuration
+
+The files in the `config` directory set environment variables for each environment - `development.json`, `staging.json` and `production.json`. A `development.json` is created as part of `npm run build-example-podcast`. The config fields are:
+
+* `PUSHKIN_HOST`, `PUSHKIN_KEY`: The configuration for [pushkin-client](https://github.com/gdnmobilelab/pushkin-client). This is used to allow users to subscribe/unsubscribe from new episode alerts.
+* `ANALYTICS_ID`: A Google Analytics ID to send various events to as the user interacts with the player. Leave blank to output these to the browser console instead.
+* `SCRIPT_URL`: The JSON file that contains the podcast script.
+
+## Editing a script
+
+The example script (at `bundles/example-podcast/script.json` after installation) shows some examples of the different types of annotation you can add to a podcast - text, images and links. You can also combine an image and a link in one annotation, as well as provide multiple images - though that ended up not being used in Strange Bird, it will show the first image and allow you to swipe to the others when in the expanded photo gallery view. All URLs in the script file are relative to the script URL.
+
 ---
 
 The example podcast uses a few assets found online:
