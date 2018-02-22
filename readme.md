@@ -6,7 +6,7 @@ An "augmented" podcast player by the Guardian Mobile Innovation Lab. Delivers li
 
 ## State of the project
 
-This is a de-branded version of the code used in the [Strange Bird audio experiment](https://www.theguardian.com/strangebird). As a result of the experiment changing course a few times during development the code isn't very well organised, so I wouldn't recommend taking this wholesale as an audio player. However, you can use it successfully as a proof of concept to experiment with adding annotations to the podcast of your choice.
+This is a de-branded version of the code used in the [Strange Bird audio experiment](https://www.theguardian.com/strangebird). As a result of the experiment changing course a few times during development the code isn't very well organised, so I wouldn't recommend taking this wholesale as an audio player. However, you can use it successfully as a proof of concept to experiment with adding annotations to the podcast of your choice. There is also some brand-specific stuff left over e.g. ("Ask Mona a question") because they didn't easily fit into a script and were hardcoded due to time constraints.
 
 ## Installing and running
 
