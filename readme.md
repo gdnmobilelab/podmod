@@ -42,7 +42,7 @@ The example script (at `bundles/example-podcast/script.json` after installation)
 
 The example podcast uses a few assets found online:
 
-The robot avatar: Robot by iconsmind.com from the Noun Project
+The robot avatar: [Robot by iconsmind.com from the Noun Project](https://thenounproject.com/search/?q=robot&i=71680)
 
 The 'beep' for new content: https://freesound.org/people/pan14/sounds/263133/
 
